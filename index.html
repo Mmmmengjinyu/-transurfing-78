@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reality Transurfing 阅读日志 — 78天</title>
+<style>
+/* ========================================
+   RESET & BASE
+   ======================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #fdfaf3;
+  --bg-card: #fffef9;
+  --text: #2c2416;
+  --text-muted: #6b5e4a;
+  --gold: #b8963e;
+  --gold-light: #d4b96a;
+  --border: #e0d7c2;
+  --sidebar-bg: #f7f2e4;
+  --sidebar-hover: #ede3ce;
+  --sidebar-active: #e4d5b0;
+  --accent-en: #8b6f47;
+  --accent-cn: #5a7a6f;
+  --accent-question: #9b5984;
+  --accent-reflect: #c47b3b;
+  --accent-summary: #3b6b8b;
+  --dot-empty: #d4cbb8;
+  --dot-filled: #b8963e;
+  --shadow: 0 2px 8px rgba(44,36,22,0.06), 0 1px 3px rgba(44,36,22,0.04);
+  --shadow-lg: 0 4px 20px rgba(44,36,22,0.10), 0 2px 6px rgba(44,36,22,0.05);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --transition: 0.2s ease;
+}
+
+body {
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  grid-template-rows: 1fr;
+  height: 100vh;
+  overflow: hidden;
+  line-height: 1.6;
+}
+
+/* ========================================
+   SIDEBAR
+   ======================================== */
+.sidebar {
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  padding: 20px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-header h1 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.progress-bar-wrap {
+  margin: 12px 20px 0;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+.progress-text {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin: 4px 20px 0;
+  text-align: right;
+}
+
+.day-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+.day-nav::-webkit-scrollbar { width: 4px; }
+.day-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Part group */
+.part-group {
+  margin-bottom: 2px;
+}
+.part-toggle {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; padding: 10px 20px;
+  border: none; background: none;
+  font-size: 0.82rem; font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: left;
+  letter-spacing: 0.04em;
+  transition: color var(--transition);
+}
+.part-toggle:hover { color: var(--text); }
+.part-toggle .arrow {
+  font-size: 0.6rem; transition: transform var(--transition);
+  display: inline-block;
+}
+.part-group.collapsed .part-toggle .arrow { transform: rotate(-90deg); }
+.part-group.collapsed .day-list { display: none; }
+
+/* Day items */
+.day-list { list-style: none; }
+.day-item { display: block; }
+.day-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 20px 6px 32px;
+  text-decoration: none; color: var(--text);
+  font-size: 0.84rem;
+  transition: background var(--transition);
+  cursor: pointer; border: none; background: none; width: 100%; text-align: left;
+  font-family: inherit;
+}
+.day-link:hover { background: var(--sidebar-hover); }
+.day-link.active { background: var(--sidebar-active); font-weight: 600; }
+.day-link .dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  background: var(--dot-empty);
+  transition: background var(--transition);
+}
+.day-link .dot.filled { background: var(--dot-filled); }
+.day-link .day-num { min-width: 28px; font-variant-numeric: tabular-nums; }
+.day-link .day-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ========================================
+   SIDEBAR FOOTER
+   ======================================== */
+.sidebar-footer {
+  padding: 6px 10px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 4px; flex-shrink: 0;
+}
+.sidebar-footer button {
+  flex: 1; padding: 5px 6px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg-card); color: var(--text);
+  font-size: 0.7rem; cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition);
+}
+.sidebar-footer button:hover { background: var(--sidebar-hover); border-color: var(--gold); }
+
+/* ========================================
+   MAIN CONTENT
+   ======================================== */
+.main {
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.main-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+  flex-shrink: 0;
+  gap: 12px;
+}
+.main-header .day-label { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.02em; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.main-header .day-label .cn { color: var(--text-muted); font-weight: 400; font-size: 0.9rem; }
+.editable-title {
+  outline: none; border-radius: 4px; padding: 2px 6px; margin: -2px 0;
+  transition: background 0.15s ease;
+  min-width: 60px; display: inline-block;
+  cursor: text;
+}
+.editable-title:hover { background: rgba(184,150,62,0.08); }
+.editable-title:focus { background: rgba(184,150,62,0.12); color: var(--text); }
+.day-date-pick {
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem; font-family: inherit;
+  color: var(--text); background: var(--bg);
+  width: 130px;
+}
+.day-date-clear {
+  padding: 3px 6px; font-size: 0.65rem;
+  border: none; background: none;
+  color: var(--text-muted); cursor: pointer;
+  font-family: inherit;
+  visibility: hidden;
+}
+.day-date-clear.has-date { visibility: visible; }
+.day-date-clear:hover { color: #c44; }
+.done-toggle {
+  font-size: 0.75rem; color: var(--text-muted); cursor: pointer;
+  display: flex; align-items: center; gap: 4px; user-select: none;
+  white-space: nowrap;
+}
+.done-toggle input { cursor: pointer; margin: 0; }
+.nav-buttons { display: flex; gap: 6px; }
+.nav-buttons button {
+  padding: 8px 18px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg); color: var(--text);
+  font-size: 0.84rem; cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition);
+}
+.nav-buttons button:hover:not(:disabled) { background: var(--sidebar-hover); border-color: var(--gold); }
+.nav-buttons button:disabled { opacity: 0.35; cursor: default; }
+.mobile-menu-btn {
+  display: none;
+  padding: 6px 14px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg); color: var(--text);
+  font-size: 1.1rem; cursor: pointer;
+  font-family: inherit;
+}
+
+.content-scroll {
+  flex: 1; overflow-y: auto; padding: 24px 28px 40px;
+}
+.content-scroll::-webkit-scrollbar { width: 6px; }
+.content-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ========================================
+   CARDS
+   ======================================== */
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  max-width: 1100px;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.card.card-full { grid-column: 1 / -1; }
+.bottom-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 18px;
+}
+@media (max-width: 768px) {
+  .bottom-row { grid-template-columns: 1fr; }
+}
+
+.card-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600; font-size: 0.9rem;
+  letter-spacing: 0.02em;
+}
+.card-header .card-icon { font-size: 1.1rem; }
+.card-en .card-header { color: var(--accent-en); }
+.card-cn .card-header { color: var(--accent-cn); }
+.card-question .card-header { color: var(--accent-question); }
+.card-reflect .card-header { color: var(--accent-reflect); }
+.card-summary .card-header { color: var(--accent-summary); }
+
+.card-body { display: flex; min-height: 0; }
+.card-body-split { flex-direction: column; gap: 0; }
+.card-body-split .sub-section {
+  display: flex; flex-direction: column;
+  border-bottom: 1px solid var(--border);
+  flex: 0 0 auto;
+}
+.card-body-split .sub-section:last-child { border-bottom: none; }
+.sub-label {
+  font-size: 0.8rem; font-weight: 700; letter-spacing: 0.02em;
+  padding: 10px 18px 6px;
+  color: #fff;
+  background: var(--accent-en);
+  display: flex; align-items: center; gap: 6px;
+}
+.card-cn .sub-label { background: var(--accent-cn); }
+.sub-label::before {
+  content: '▸'; font-size: 0.6rem;
+}
+.card-body textarea, .card-body .editable {
+  display: block; width: 100%; box-sizing: border-box;
+  padding: 16px 18px;
+  border: none; background: transparent;
+  font-size: 0.9rem; line-height: 2.0;
+  color: var(--text); resize: none; overflow: hidden;
+  font-family: inherit;
+  min-height: 80px;
+}
+.card-body textarea.text-en, .card-body .editable.text-en {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* ========================================
+   FORMAT TOOLBAR
+   ======================================== */
+.format-toolbar {
+  position: absolute; z-index: 50;
+  display: none; align-items: center; gap: 2px;
+  padding: 4px 6px;
+  background: #3a3224; border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  transform: translateY(-110%);
+}
+.format-toolbar.show { display: flex; }
+.format-toolbar button {
+  width: 30px; height: 28px;
+  border: none; border-radius: 5px;
+  background: transparent; color: #d4c9b0;
+  font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-family: inherit;
+  transition: all 0.12s ease;
+}
+.format-toolbar button:hover { background: rgba(255,255,255,0.15); color: #fff; }
+.format-toolbar button.active { background: var(--gold); color: #fff; }
+.format-toolbar .fmt-sep {
+  width: 1px; height: 16px; background: rgba(255,255,255,0.2); margin: 0 3px;
+}
+.format-toolbar button.fmt-highlight { color: #f5d442; }
+.format-toolbar button.fmt-highlight:hover { background: rgba(245,212,66,0.3); }
+
+/* contenteditable extra styling */
+.editable {
+  outline: none;
+}
+.editable:empty::before {
+  content: attr(data-placeholder);
+  color: #c4b998; font-style: italic;
+}
+.editable b, .editable strong { font-weight: 700; }
+.editable i, .editable em { font-style: italic; }
+.editable u { text-decoration: underline; }
+.editable .hl { background: #fef3a0; padding: 0 2px; border-radius: 2px; }
+.card-body textarea:focus { outline: none; }
+.card-body textarea::placeholder { color: #c4b998; font-style: italic; }
+.card-body .saved-indicator {
+  position: absolute; bottom: 8px; right: 14px;
+  font-size: 0.7rem; color: #8b9a6b;
+  opacity: 0; transition: opacity 0.4s ease;
+}
+.card-body .saved-indicator.show { opacity: 1; }
+
+/* ========================================
+   OVERLAY (mobile sidebar)
+   ======================================== */
+.sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(44,36,22,0.3);
+  z-index: 90;
+}
+.sidebar-overlay.show { display: block; }
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+  body { grid-template-columns: 1fr; }
+  .sidebar {
+    position: fixed; left: 0; top: 0; height: 100vh; width: 280px;
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: var(--shadow-lg);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .mobile-menu-btn { display: inline-block; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .content-scroll { padding: 16px 14px 32px; }
+  .main-header { padding: 12px 14px; }
+  .main-header .day-label { font-size: 1rem; }
+  .nav-buttons button { padding: 6px 12px; font-size: 0.78rem; }
+  .sidebar-overlay.show { display: block; }
+}
+
+@media (max-width: 480px) {
+  .main-header { flex-wrap: wrap; }
+  .main-header .day-label { order: 1; width: 100%; }
+  .nav-buttons { order: 2; }
+}
+
+/* ========================================
+   SUPPLEMENT TABLE
+   ======================================== */
+.supp-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 24px 28px;
+}
+.supp-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+.supp-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px; }
+.supp-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; line-height: 1.7; }
+.supp-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.supp-table tr:last-child td { border-bottom: none; }
+.supp-label {
+  font-weight: 700; color: var(--gold); white-space: nowrap;
+  width: 110px; min-width: 90px;
+}
+
+/* ========================================
+   FOCUS MODE
+   ======================================== */
+body.focus-mode { grid-template-columns: 1fr; }
+body.focus-mode .sidebar { display: none; }
+body.focus-mode .sidebar-overlay { display: none; }
+body.focus-mode .cal-strip { display: none; }
+body.focus-mode .main-header { padding-left: 28px; }
+.focus-btn {
+  padding: 6px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg); color: var(--text); cursor: pointer;
+  font-size: 0.78rem; font-family: inherit;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.focus-btn:hover { border-color: var(--gold); }
+.focus-btn.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+
+/* ========================================
+   CHAT PANEL
+   ======================================== */
+.chat-btn {
+  position: fixed; bottom: 24px; right: 24px; z-index: 200;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--gold); color: #fff; border: none;
+  font-size: 1.3rem; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  transition: all 0.2s ease;
+  display: flex; align-items: center; justify-content: center;
+}
+.chat-btn:hover { background: #a07d2e; transform: scale(1.08); }
+.chat-panel {
+  position: fixed; top: 0; right: -420px; width: 400px; height: 100vh;
+  z-index: 210; background: var(--bg-card); border-left: 1px solid var(--border);
+  box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+  transition: right 0.3s ease;
+  display: flex; flex-direction: column;
+}
+.chat-panel.open { right: 0; }
+.chat-panel-header {
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
+}
+.chat-panel-header button {
+  border: none; background: none; font-size: 1.2rem; cursor: pointer;
+  color: var(--text-muted); padding: 2px 6px; font-family: inherit;
+}
+.chat-api-row {
+  padding: 8px 14px; border-bottom: 1px solid var(--border);
+  display: flex; gap: 6px; flex-shrink: 0; font-size: 0.72rem;
+}
+.chat-api-row input {
+  flex: 1; padding: 5px 8px; border: 1px solid var(--border);
+  border-radius: 4px; font-size: 0.72rem; font-family: inherit;
+  background: var(--bg);
+}
+.chat-api-row button {
+  padding: 5px 10px; border: 1px solid var(--border);
+  border-radius: 4px; background: var(--bg); cursor: pointer;
+  font-size: 0.7rem; font-family: inherit; white-space: nowrap;
+}
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 14px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.chat-msg {
+  max-width: 88%; padding: 10px 14px; border-radius: 14px;
+  font-size: 0.82rem; line-height: 1.6; word-break: break-word;
+}
+.chat-msg.user {
+  align-self: flex-end; background: var(--gold); color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.chat-msg.assistant {
+  align-self: flex-start; background: #f0ebe0; color: var(--text);
+  border-bottom-left-radius: 4px;
+}
+.chat-msg.error { background: #fce4e4; color: #a33; align-self: stretch; border-radius: 8px; }
+.chat-input-row {
+  padding: 10px 14px; border-top: 1px solid var(--border);
+  display: flex; gap: 8px; flex-shrink: 0;
+}
+.chat-input-row textarea {
+  flex: 1; padding: 8px 12px; border: 1px solid var(--border);
+  border-radius: 8px; font-size: 0.82rem; font-family: inherit;
+  resize: none; min-height: 38px; max-height: 100px;
+  background: var(--bg);
+}
+.chat-input-row button {
+  padding: 8px 16px; border: none; border-radius: 8px;
+  background: var(--gold); color: #fff; font-weight: 600;
+  cursor: pointer; font-size: 0.82rem; font-family: inherit;
+  white-space: nowrap;
+}
+.chat-input-row button:disabled { opacity: 0.4; cursor: default; }
+.chat-typing { font-size: 0.72rem; color: var(--text-muted); padding: 4px 14px; display: none; }
+.chat-typing.show { display: block; }
+.chat-model-btn {
+  padding: 4px 12px; border: 1px solid var(--border); border-radius: 14px;
+  background: var(--bg); color: var(--text-muted); cursor: pointer;
+  font-size: 0.72rem; font-family: inherit;
+  transition: all 0.15s ease;
+}
+.chat-model-btn.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+.chat-model-btn:hover:not(.active) { border-color: var(--gold); color: var(--text); }
+
+@media (max-width: 768px) {
+  .chat-panel { width: 100vw; right: -100vw; }
+}
+
+/* ========================================
+   CALENDAR STRIP (compact)
+   ======================================== */
+.cal-strip {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 16px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  max-width: 1100px;
+  flex-wrap: wrap;
+  font-size: 0.72rem;
+}
+.cal-strip-label {
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-size: 0.7rem;
+  cursor: pointer;
+  user-select: none;
+}
+.cal-strip-cells {
+  display: flex; gap: 3px; flex-wrap: wrap; align-items: center;
+}
+.cal-strip-cell {
+  width: 20px; height: 20px;
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.55rem; font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.12s ease;
+  font-family: inherit;
+  background: #e8e2d2;
+  color: #a09578;
+  padding: 0;
+  line-height: 1;
+}
+.cal-strip-cell:hover { transform: scale(1.25); z-index: 2; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+.cal-strip-cell.filled { background: var(--gold); color: #fff; font-weight: 600; }
+.cal-strip-cell.current { border-color: #c47b3b; box-shadow: 0 0 0 1.5px rgba(196,123,59,0.3); }
+.cal-strip-cell.today-mark { border-color: var(--accent-cn); border-style: dashed; }
+
+.cal-strip-month-sep {
+  width: 0; height: 14px;
+  border-left: 1px solid var(--border);
+  margin: 0 4px;
+}
+.cal-strip-month-label {
+  font-size: 0.6rem; color: var(--text-muted);
+  white-space: nowrap;
+  margin-right: 2px;
+}
+
+/* ========================================
+   PRINT
+   ======================================== */
+@media print {
+  body { display: block; overflow: visible; }
+  .sidebar, .sidebar-overlay, .main-header, .nav-buttons, .mobile-menu-btn, .sidebar-footer { display: none !important; }
+  .main { overflow: visible; }
+  .content-scroll { overflow: visible; padding: 0; }
+  .cards-grid { max-width: 100%; }
+  .card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+  .card-body textarea, .card-body .editable { border: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- SIDEBAR OVERLAY (mobile)                     -->
+<!-- ============================================ -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================ -->
+<!-- SIDEBAR                                      -->
+<!-- ============================================ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h1>📖 Transurfing in 78 Days</h1>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+  <div class="progress-text" id="progressText">已完成 0 / 78 天</div>
+
+  <nav class="day-nav" id="dayNav">
+    <!-- Generated by JS -->
+  </nav>
+
+  <div class="sidebar-footer">
+    <button onclick="loadPresetContent()" title="导入前20天英文原文">📥</button>
+    <button onclick="exportAll()" title="导出">💾</button>
+    <button onclick="document.getElementById('importFile').click()" title="导入">📤</button>
+  </div>
+  <div style="padding:4px 10px;border-top:1px solid var(--border);display:flex;gap:4px;align-items:center;">
+    <button id="cloudSetupBtn" onclick="setupCloud()" title="设置 GitHub Token" style="flex:1;padding:4px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg-card);font-size:0.65rem;cursor:pointer;font-family:inherit;">设置</button>
+    <button id="cloudBtn" onclick="downloadFromCloud()" title="从云端下载数据" style="flex:1;padding:4px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg-card);font-size:0.65rem;cursor:pointer;font-family:inherit;">☁️ 下载</button>
+    <button onclick="disableCloud()" title="断开云同步" style="padding:4px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg-card);font-size:0.65rem;cursor:pointer;font-family:inherit;color:#c44;">✕</button>
+  </div>
+  <div id="cloudInfo" style="padding:2px 10px;font-size:0.6rem;color:var(--accent-cn);text-align:center;"></div>
+  <input type="file" id="importFile" accept=".txt" style="display:none" onchange="importAll(this)">
+</aside>
+
+<!-- ============================================ -->
+<!-- MAIN CONTENT                                 -->
+<!-- ============================================ -->
+<main class="main">
+  <div class="main-header">
+    <button class="mobile-menu-btn" id="mobileMenuBtn" title="目录">☰ 目录</button>
+    <button class="focus-btn" id="focusBtn" onclick="toggleFocusMode()" title="专注模式：隐藏侧边栏和日历">🧘 专注</button>
+    <div class="day-label">
+      Day <span id="dayNum">1</span>
+      <span class="cn editable-title" id="dayTitleBoth" contenteditable="true">觉醒 / Awakening</span>
+      <input type="date" id="dayDateInput" class="day-date-pick" onchange="setDayDate(currentDay, this.value)" title="为此天指定学习日期（可选）">
+      <button onclick="clearDayDate(currentDay)" class="day-date-clear" id="dayDateClear" title="清除此天日期">✕</button>
+      <label class="done-toggle" title="标记为已完成"><input type="checkbox" id="dayDoneCb" onchange="toggleDayDone()"> 已完成</label>
+    </div>
+    <div class="nav-buttons">
+      <button id="prevBtn" onclick="navigateDay(-1)">← 上一日</button>
+      <button id="nextBtn" onclick="navigateDay(1)">下一日 →</button>
+    </div>
+  </div>
+
+  <div class="content-scroll" id="contentScroll">
+    <!-- Compact Calendar Strip -->
+    <div class="cal-strip" id="calStrip">
+      <span class="cal-strip-label" title="78天概览">📅</span>
+      <span class="cal-strip-cells" id="calCells"></span>
+    </div>
+
+    <div class="cards-grid" id="cardsGrid">
+      <!-- EN + CN side by side -->
+      <div class="card card-en">
+        <div class="card-header"><span class="card-icon">🇬🇧</span> English</div>
+        <div class="card-body card-body-split">
+          <div class="sub-section">
+            <div class="sub-label">Principle</div>
+            <div id="principleEn" class="editable text-en" contenteditable="true" data-placeholder="Enter the Principle..."></div>
+          </div>
+          <div class="sub-section">
+            <div class="sub-label">Interpretation</div>
+            <div id="interpretationEn" class="editable text-en" contenteditable="true" data-placeholder="Enter the Interpretation..."></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-cn">
+        <div class="card-header"><span class="card-icon">🇨🇳</span> 中文</div>
+        <div class="card-body card-body-split">
+          <div class="sub-section">
+            <div class="sub-label">原则</div>
+            <div id="principleCn" class="editable" contenteditable="true" data-placeholder="输入原则翻译..."></div>
+          </div>
+          <div class="sub-section">
+            <div class="sub-label">解读</div>
+            <div id="interpretationCn" class="editable" contenteditable="true" data-placeholder="输入解读翻译..."></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Questions + Reflections -->
+      <div class="card card-question">
+        <div class="card-header"><span class="card-icon">❓</span> 疑问</div>
+        <div class="card-body">
+          <div id="questions" class="editable" contenteditable="true" data-placeholder="今天哪里没看懂？有什么困惑？"></div>
+        </div>
+      </div>
+
+      <div class="card card-reflect">
+        <div class="card-header"><span class="card-icon">💭</span> 反思</div>
+        <div class="card-body">
+          <div id="reflections" class="editable" contenteditable="true" data-placeholder="今天的内容让我想到了什么？有什么觉察？"></div>
+        </div>
+      </div>
+
+      <!-- Summary (centered, narrower) -->
+      <div class="card card-summary" style="grid-column:1/-1; max-width:66%; margin:0 auto; width:100%;">
+        <div class="card-header"><span class="card-icon">✍️</span> 总结</div>
+        <div class="card-body">
+          <div id="summary" class="editable" contenteditable="true" data-placeholder="用一句话总结今天的收获..."></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supplement reading view (hidden by default) -->
+    <div id="supplementView" style="display:none; max-width:1100px;"></div>
+
+  </div>
+</main>
+
+<!-- Formatting Toolbar -->
+<div class="format-toolbar" id="formatToolbar">
+  <button onclick="fmt('bold')" title="加粗 (Ctrl+B)"><b>B</b></button>
+  <button onclick="fmt('italic')" title="斜体 (Ctrl+I)"><i>I</i></button>
+  <button onclick="fmt('underline')" title="下划线 (Ctrl+U)"><u>U</u></button>
+  <span class="fmt-sep"></span>
+  <button class="fmt-highlight" onclick="fmt('highlight')" title="高亮">🖊</button>
+</div>
+
+<!-- AI Chat Launcher -->
+<button class="chat-btn" id="chatBtn" onclick="toggleChat()" title="与 AI 讨论当前内容">💬</button>
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-panel-header">
+    💬 问 AI · <span id="chatDayLabel">Day 1</span>
+    <button onclick="toggleChat()">✕</button>
+  </div>
+  <div style="padding:8px 14px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:8px;">
+    <span style="font-size:0.72rem;color:var(--text-muted);">选择模型：</span>
+    <button id="chatModelGpt" class="chat-model-btn active" onclick="setChatModel('gpt')">ChatGPT</button>
+    <button id="chatModelDs" class="chat-model-btn" onclick="setChatModel('deepseek')">DeepSeek</button>
+  </div>
+  <div style="padding:6px 14px;font-size:0.7rem;color:var(--text-muted);border-bottom:1px solid var(--border);flex-shrink:0;" id="chatHint">
+    输入问题 → 自动复制内容 → 打开 ChatGPT → 粘贴发送
+  </div>
+  <div class="chat-messages" id="chatMessages" style="flex:1;">
+    <div class="chat-msg assistant">输入你想问的问题，点击发送。我会把这一天的 Principle + Interpretation 内容连同你的问题一起复制到剪贴板，然后打开 ChatGPT 网页。你在 ChatGPT 里 Ctrl+V 粘贴即可。</div>
+  </div>
+  <div class="chat-input-row">
+    <textarea id="chatInput" rows="2" placeholder="例如：这一天的核心观点怎么用到减肥上？" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+    <button id="chatSendBtn" onclick="sendChat()">发送</button>
+  </div>
+</div>
+
+<script>
+/* ============================================
+   DATA: 78 Days Structure
+   ============================================ */
+const DAYS = [
+  // Part 1: Day 1–10 Awakening
+  { part:1, day:1,  titleEn:'Awakening',               titleCn:'觉醒' },
+  { part:1, day:2,  titleEn:'Hacking the Dream',        titleCn:'黑入梦境' },
+  { part:1, day:3,  titleEn:'Child of God',             titleCn:'神之子' },
+  { part:1, day:4,  titleEn:'A Star Is Born',           titleCn:'一颗星诞生了' },
+  { part:1, day:5,  titleEn:'The World Mirror',         titleCn:'世界之镜' },
+  { part:1, day:6,  titleEn:'The Boomerang',            titleCn:'回旋镖' },
+  { part:1, day:7,  titleEn:'The Illusory Reflection',  titleCn:'幻象反射' },
+  { part:1, day:8,  titleEn:'The Pink Twins',           titleCn:'粉色双胞胎' },
+  { part:1, day:9,  titleEn:'The Sigh of Relief',       titleCn:'如释重负' },
+  { part:1, day:10, titleEn:'Release',                  titleCn:'释放' },
+
+  // Part 2: Day 11–30 Practice
+  { part:2, day:11, titleEn:'Confidence',               titleCn:'自信' },
+  { part:2, day:12, titleEn:'Balance',                  titleCn:'平衡' },
+  { part:2, day:13, titleEn:'The Charismatic Soul',     titleCn:'有魅力的灵魂' },
+  { part:2, day:14, titleEn:'Love Yourself',            titleCn:'爱自己' },
+  { part:2, day:15, titleEn:'I Am My Goal',             titleCn:'我就是我的目标' },
+  { part:2, day:16, titleEn:'Faith',                    titleCn:'信念' },
+  { part:2, day:17, titleEn:'Feelings of Guilt',        titleCn:'负罪感' },
+  { part:2, day:18, titleEn:'Self-worth',               titleCn:'自我价值' },
+  { part:2, day:19, titleEn:'The Master\'s Credo',      titleCn:'主人的信条' },
+  { part:2, day:20, titleEn:'Your True Path',           titleCn:'你的真实道路' },
+  { part:2, day:21, titleEn:'Trusting the Universe',    titleCn:'信任宇宙' },
+  { part:2, day:22, titleEn:'The External Intention in Action', titleCn:'外在意念实战' },
+  { part:2, day:23, titleEn:'Doors and Reality Lines',  titleCn:'门与现实线路' },
+  { part:2, day:24, titleEn:'Choosing Your Reality',    titleCn:'选择你的现实' },
+  { part:2, day:25, titleEn:'Slides and Frames',        titleCn:'幻灯片与框架' },
+  { part:2, day:26, titleEn:'The Importance of Detachment', titleCn:'不执着的意义' },
+  { part:2, day:27, titleEn:'Working with Pendulums',   titleCn:'与钟摆共处' },
+  { part:2, day:28, titleEn:'Energy and Vibration',     titleCn:'能量与振动' },
+  { part:2, day:29, titleEn:'Signals from the Mirror',  titleCn:'来自镜子的信号' },
+  { part:2, day:30, titleEn:'Halfway Reflection',       titleCn:'中途反思' },
+
+  // Part 3: Day 31–60 Reality Changes
+  { part:3, day:31, titleEn:'Recognizing Shifts',       titleCn:'识别变化' },
+  { part:3, day:32, titleEn:'The Power of Calm',        titleCn:'平静的力量' },
+  { part:3, day:33, titleEn:'Synchronicity',            titleCn:'同步性' },
+  { part:3, day:34, titleEn:'The Guardian',             titleCn:'守护者' },
+  { part:3, day:35, titleEn:'Anomalies and Signs',      titleCn:'异常与信号' },
+  { part:3, day:36, titleEn:'Reality Lines Converging', titleCn:'现实线路汇聚' },
+  { part:3, day:37, titleEn:'The Art of Not Interfering', titleCn:'不干涉的艺术' },
+  { part:3, day:38, titleEn:'Pendulum-Free Zones',      titleCn:'无钟摆地带' },
+  { part:3, day:39, titleEn:'The Importance of Rest',   titleCn:'休息的重要性' },
+  { part:3, day:40, titleEn:'Midpoint Check-In',        titleCn:'中点检视' },
+  { part:3, day:41, titleEn:'Observing Without Judging',titleCn:'观察而不评判' },
+  { part:3, day:42, titleEn:'The Flow State',            titleCn:'心流状态' },
+  { part:3, day:43, titleEn:'Aligning Actions with Slides', titleCn:'行动对齐幻灯片' },
+  { part:3, day:44, titleEn:'Money and Transurfing',    titleCn:'金钱与转移' },
+  { part:3, day:45, titleEn:'Relationships and Mirrors', titleCn:'关系与镜子' },
+  { part:3, day:46, titleEn:'Health as a Reflection',   titleCn:'健康作为反射' },
+  { part:3, day:47, titleEn:'Work and Vocation',        titleCn:'工作与使命' },
+  { part:3, day:48, titleEn:'Breaking Old Patterns',    titleCn:'打破旧模式' },
+  { part:3, day:49, titleEn:'Building New Habits',      titleCn:'建立新习惯' },
+  { part:3, day:50, titleEn:'The Halfway Mirror',       titleCn:'中途之镜' },
+  { part:3, day:51, titleEn:'Deepening the Practice',   titleCn:'深化练习' },
+  { part:3, day:52, titleEn:'Handling Doubt',            titleCn:'处理怀疑' },
+  { part:3, day:53, titleEn:'The Inner Pendulum',       titleCn:'内在钟摆' },
+  { part:3, day:54, titleEn:'Joy as a Signal',          titleCn:'快乐作为信号' },
+  { part:3, day:55, titleEn:'The External Intention Muscle', titleCn:'外在意念肌肉' },
+  { part:3, day:56, titleEn:'Silence and Listening',    titleCn:'沉默与聆听' },
+  { part:3, day:57, titleEn:'The World as a Mirror in Daily Life', titleCn:'日常生活中的世界之镜' },
+  { part:3, day:58, titleEn:'Letting Reality Deliver',  titleCn:'让现实递送' },
+  { part:3, day:59, titleEn:'Preparing for Completion', titleCn:'准备完成' },
+  { part:3, day:60, titleEn:'Sixty Days of Practice',   titleCn:'六十天的练习' },
+
+  // Part 4: Day 61–78 Completion
+  { part:4, day:61, titleEn:'Integration',               titleCn:'整合' },
+  { part:4, day:62, titleEn:'Living the Principles',    titleCn:'活出原则' },
+  { part:4, day:63, titleEn:'The No-Return Point',      titleCn:'不归点' },
+  { part:4, day:64, titleEn:'Creating Your Own Slides', titleCn:'创造你自己的幻灯片' },
+  { part:4, day:65, titleEn:'The Balanced Life',        titleCn:'平衡的人生' },
+  { part:4, day:66, titleEn:'Teaching Without Teaching',titleCn:'不教而教' },
+  { part:4, day:67, titleEn:'The Eternal Student',      titleCn:'永远的学生' },
+  { part:4, day:68, titleEn:'Looking Back at Day 1',    titleCn:'回看第一天' },
+  { part:4, day:69, titleEn:'What Has Changed',         titleCn:'什么改变了' },
+  { part:4, day:70, titleEn:'The New Default',          titleCn:'新的默认状态' },
+  { part:4, day:71, titleEn:'Gratitude and Surrender',  titleCn:'感恩与臣服' },
+  { part:4, day:72, titleEn:'Your Personal Transurfing',titleCn:'你的个人转移法' },
+  { part:4, day:73, titleEn:'Beyond the 78 Days',       titleCn:'78天之后' },
+  { part:4, day:74, titleEn:'Writing Your Own Chapter', titleCn:'书写你自己的章节' },
+  { part:4, day:75, titleEn:'The Final Pendulum Check', titleCn:'最后的钟摆检查' },
+  { part:4, day:76, titleEn:'Your Target Slide Revisited', titleCn:'重温你的目标幻灯片' },
+  { part:4, day:77, titleEn:'The Day Before Completion',titleCn:'完成前一日' },
+  { part:4, day:78, titleEn:'Completion — A New Beginning', titleCn:'完成——新的开始' }
+];
+
+/* Supplementary reading — defaults + custom entries from localStorage */
+var DEFAULT_SUPPLEMENTS = [
+  {
+    id: 'dispenza',
+    author: 'Dr. Joe Dispenza',
+    title: '《Breaking the Habit of Being Yourself》/ 中文版《未来预演》',
+    content: '<b>核心方法：Mental Rehearsal（心理演练）</b><br><br><b>核心观点：</b>大脑无法区分真实经历与生动想象。通过有意识、重复地在脑海中进行高度专注的想象，重塑大脑神经回路（神经可塑性），在不实际行动的情况下提前"练习"某种技能、状态或人生结果。<br><br><b>主要原理：</b><br>① 神经可塑性：想象激活的脑区与真实行动高度重叠，反复想象使神经元连接增强<br>② 情绪锚点：预演中要感受相应的情绪（自信、感恩、喜悦），情绪是大脑学习与记忆的强力锚点<br>③ 打破旧模式：每天练习脱离由过去经验、习惯情绪和限制性信念组成的旧自我<br><br><b>典型案例：</b>谷爱凌滑雪前在脑海中预演一遍过程——不只是在"看"自己滑雪，而是在"感受"身体的倾斜、肌肉的发力、雪板的震动和空气的流速。<br><br><b>补充：</b>配套冥想音频《Meditations for Breaking the Habit of Being Yourself》可配合使用。<br><br><b>与 RT 的关系：</b>与 RT 的"目标幻灯片"和 Day 7"先制作画面再看镜子"直接对应。'
+  },
+  {
+    id: 'neville',
+    author: 'Neville Goddard（内维尔·戈达德）',
+    title: '《天赋的力量》',
+    content: '<b>核心观点：想象力即是神，意识创造现实</b><br><br>你所停留的意识状态，决定了你活在哪一个世界里。改变现实的唯一方法，就是将你的意识提升到你所渴望的事物上。你必须勇敢地在内心活出"仿佛已经拥有"的状态——因为一切都已具足，只等着你去取用。<br><br><b>经典语录：</b><br>"你的意识就是神，要以最高的理想来定义自己。"<br>"你必须勇敢地活出自己的人生，仿佛你已经拥有了所有想要的东西。因为一切已经具足，只等着你取用。"<br>"一切都是由想象的力量所创造出来，万物全始于人的想象之中。"<br><br><b>影响：</b>被称为"吸引力法则的原型"，影响了包括《秘密》作者朗达·拜恩在内的众多灵性导师。<br><br><b>与 RT 的关系：</b>RT 的更早期思想源头。两者都指向同一个方向：外在现实是你内在状态的投射。RT 提供更复杂的操作体系，内维尔提供更直接的信念框架。不像 RT 有复杂的"变体空间""钟摆""过剩势能"等术语体系，内维尔更直接、更简洁。'
+  }
+];
+
+function getSupplements() {
+  var custom = localStorage.getItem(STORAGE_PREFIX + 'supplements');
+  var list = custom ? JSON.parse(custom) : [];
+  return DEFAULT_SUPPLEMENTS.concat(list);
+}
+
+/* ============================================
+   STATE
+   ============================================ */
+let currentDay = 0; // 0-indexed into DAYS
+const STORAGE_PREFIX = 'rt78_';
+
+/* ============================================
+   DOM REFS
+   ============================================ */
+const $sidebar       = document.getElementById('sidebar');
+const $sidebarOverlay= document.getElementById('sidebarOverlay');
+const $dayNav        = document.getElementById('dayNav');
+const $dayNum        = document.getElementById('dayNum');
+const $dayTitleBoth  = document.getElementById('dayTitleBoth');
+const $prevBtn       = document.getElementById('prevBtn');
+const $nextBtn       = document.getElementById('nextBtn');
+const $contentScroll = document.getElementById('contentScroll');
+const $progressBar   = document.getElementById('progressBar');
+const $progressText  = document.getElementById('progressText');
+const $mobileMenuBtn = document.getElementById('mobileMenuBtn');
+
+const textareaIds = ['principleEn','interpretationEn','principleCn','interpretationCn','questions','reflections','summary'];
+const textareas = {};
+textareaIds.forEach(id => { textareas[id] = document.getElementById(id); });
+
+/* ============================================
+   LOCALSTORAGE
+   ============================================ */
+function storageKey(dayIndex, field) {
+  return STORAGE_PREFIX + 'd' + DAYS[dayIndex].day + '_' + field;
+}
+function storageKeyOld(dayIndex, field) {
+  // Old keys used the same pattern — needed for migration
+  return STORAGE_PREFIX + 'd' + DAYS[dayIndex].day + '_' + field;
+}
+
+/* Migrate old data (contentEn/contentCn → principleEn/interpretationEn) */
+(function migrateOldData() {
+  for (let i = 0; i < DAYS.length; i++) {
+    const oldEn = localStorage.getItem(storageKeyOld(i, 'contentEn'));
+    const newEn = localStorage.getItem(storageKey(i, 'principleEn'));
+    if (oldEn && !newEn) {
+      localStorage.setItem(storageKey(i, 'principleEn'), oldEn);
+      localStorage.removeItem(storageKeyOld(i, 'contentEn'));
+    }
+    const oldCn = localStorage.getItem(storageKeyOld(i, 'contentCn'));
+    const newCn = localStorage.getItem(storageKey(i, 'principleCn'));
+    if (oldCn && !newCn) {
+      localStorage.setItem(storageKey(i, 'principleCn'), oldCn);
+      localStorage.removeItem(storageKeyOld(i, 'contentCn'));
+    }
+  }
+})();
+
+function loadDay(dayIndex) {
+  const data = {};
+  textareaIds.forEach(field => {
+    const val = localStorage.getItem(storageKey(dayIndex, field));
+    data[field] = val !== null ? val : '';
+  });
+  return data;
+}
+
+function saveField(dayIndex, field, value) {
+  if (value.trim() === '') {
+    localStorage.removeItem(storageKey(dayIndex, field));
+  } else {
+    localStorage.setItem(storageKey(dayIndex, field), value);
+  }
+  updateProgress();
+}
+
+function doneKey(dayIndex) {
+  return STORAGE_PREFIX + 'd' + DAYS[dayIndex].day + '_done';
+}
+function isDayComplete(dayIndex) {
+  return localStorage.getItem(doneKey(dayIndex)) === '1';
+}
+function toggleDayDone() {
+  if (isDayComplete(currentDay)) {
+    localStorage.removeItem(doneKey(currentDay));
+  } else {
+    localStorage.setItem(doneKey(currentDay), '1');
+  }
+  updateDoneCheckbox();
+  updateProgress();
+  renderSidebar();
+  clearTimeout(window._cloudUploadTimer);
+  window._cloudUploadTimer = setTimeout(uploadToCloud, 1000);
+}
+function updateDoneCheckbox() {
+  var cb = document.getElementById('dayDoneCb');
+  if (cb) cb.checked = isDayComplete(currentDay);
+}
+
+function countCompletedDays() {
+  let count = 0;
+  for (let i = 0; i < DAYS.length; i++) {
+    if (isDayComplete(i)) count++;
+  }
+  return count;
+}
+
+/* ============================================
+   RENDER
+   ============================================ */
+function renderSidebar() {
+  $dayNav.innerHTML = '';
+  const parts = [1,2,3,4];
+  const partNames = {
+    1: { label:'🌅 Part 1 · Day 1–10 · Awakening / 觉醒' },
+    2: { label:'🔧 Part 2 · Day 11–30 · Practice / 实践' },
+    3: { label:'✨ Part 3 · Day 31–60 · Reality Changes / 现实改变' },
+    4: { label:'🏁 Part 4 · Day 61–78 · Completion / 完成' }
+  };
+
+  parts.forEach(partNum => {
+    const group = document.createElement('div');
+    group.className = 'part-group';
+    // Expand the part containing currentDay, collapse others
+    const currentPart = DAYS[currentDay].part;
+    if (currentPart !== partNum) group.classList.add('collapsed');
+
+    const toggle = document.createElement('button');
+    toggle.className = 'part-toggle';
+    toggle.innerHTML = `<span class="arrow">▼</span> ${partNames[partNum].label}`;
+    toggle.onclick = () => group.classList.toggle('collapsed');
+    group.appendChild(toggle);
+
+    const dayList = document.createElement('ul');
+    dayList.className = 'day-list';
+
+    DAYS.forEach((d, idx) => {
+      if (d.part !== partNum) return;
+      const li = document.createElement('li');
+      li.className = 'day-item';
+
+      const link = document.createElement('button');
+      link.className = 'day-link' + (idx === currentDay ? ' active' : '');
+      const dotClass = isDayComplete(idx) ? 'filled' : '';
+      var ct = localStorage.getItem(STORAGE_PREFIX + 'd' + d.day + '_title');
+      link.innerHTML = `<span class="dot ${dotClass}"></span><span class="day-num">Day ${d.day}</span><span class="day-title">` + (ct || (d.titleEn + ' / ' + d.titleCn)) + `</span>`;
+      link.onclick = (function(i){ return function(e){ e.stopPropagation(); saveCurrentContent(); currentView='day'; currentDay=i; localStorage.setItem(STORAGE_PREFIX+'currentDay',DAYS[i].day); renderSidebar(); renderMain(); renderCalendar(); closeSidebar(); }; })(idx);
+      li.appendChild(link);
+      dayList.appendChild(li);
+    });
+
+    group.appendChild(dayList);
+    $dayNav.appendChild(group);
+  });
+
+  // Part 5: Supplementary Reading
+  var suppGroup = document.createElement('div');
+  suppGroup.className = 'part-group';
+  if (currentView !== 'supplement') suppGroup.classList.add('collapsed');
+  var suppToggle = document.createElement('button');
+  suppToggle.className = 'part-toggle';
+  suppToggle.innerHTML = '<span class="arrow">▼</span> 📚 补充阅读';
+  suppToggle.onclick = function(){ suppGroup.classList.toggle('collapsed'); };
+  suppGroup.appendChild(suppToggle);
+  var suppList = document.createElement('ul');
+  suppList.className = 'day-list';
+  var supplements = getSupplements();
+  supplements.forEach(function(s, si){
+    var li = document.createElement('li'); li.className = 'day-item';
+    var row = document.createElement('div'); row.style.display = 'flex'; row.style.alignItems = 'center';
+    var link = document.createElement('button');
+    link.className = 'day-link' + (currentView==='supplement' && currentSuppIndex===si ? ' active' : '');
+    link.style.flex = '1';
+    link.innerHTML = '<span class="dot filled"></span><span class="day-title">' + s.author + '</span>';
+    link.onclick = function(){ switchToSupplement(si); };
+    row.appendChild(link);
+    // Delete button for custom entries (not defaults)
+    if (si >= DEFAULT_SUPPLEMENTS.length) {
+      var delBtn = document.createElement('button');
+      delBtn.innerHTML = '✕';
+      delBtn.title = '删除此补充阅读';
+      delBtn.style.cssText = 'border:none;background:none;color:#c44;cursor:pointer;font-size:0.7rem;padding:4px 8px;font-family:inherit;';
+      delBtn.onclick = function(e){ e.stopPropagation(); deleteSupplement(si); };
+      row.appendChild(delBtn);
+    }
+    li.appendChild(row); suppList.appendChild(li);
+  });
+  // Add button
+  var addLi = document.createElement('li'); addLi.className = 'day-item';
+  var addBtn = document.createElement('button');
+  addBtn.className = 'day-link';
+  addBtn.innerHTML = '<span class="dot" style="background:#5a7a6f;"></span><span class="day-title" style="color:var(--accent-cn);">+ 新增补充阅读</span>';
+  addBtn.onclick = function(){ addSupplement(); };
+  addLi.appendChild(addBtn); suppList.appendChild(addLi);
+  suppGroup.appendChild(suppList);
+  $dayNav.appendChild(suppGroup);
+}
+
+var currentView = 'day'; // 'day' or 'supplement'
+var currentSuppIndex = 0;
+
+function switchToSupplement(index) {
+  currentView = 'supplement';
+  currentSuppIndex = index;
+  renderSidebar();
+  renderSupplement();
+  closeSidebar();
+}
+
+function switchToDay(dayIndex) {
+  saveCurrentContent();
+  currentView = 'day';
+  currentDay = dayIndex;
+  localStorage.setItem(STORAGE_PREFIX + 'currentDay', DAYS[dayIndex].day);
+  renderSidebar();
+  renderMain();
+  renderCalendar();
+  closeSidebar();
+}
+
+function renderMain() {
+  if (currentView === 'supplement') { renderSupplement(); return; }
+  document.getElementById('cardsGrid').style.display = '';
+  document.getElementById('supplementView').style.display = 'none';
+  const d = DAYS[currentDay];
+  $dayNum.textContent = d.day;
+  var customTitle = localStorage.getItem(STORAGE_PREFIX + 'd' + d.day + '_title');
+  if ($dayTitleBoth) $dayTitleBoth.textContent = customTitle || (d.titleEn + ' / ' + d.titleCn);
+  var ct = localStorage.getItem(STORAGE_PREFIX + 'd' + d.day + '_title');
+  document.title = `Day ${d.day} · ` + (ct || (d.titleEn + ' / ' + d.titleCn)) + ` — 阅读日志`;
+
+  $prevBtn.disabled = currentDay === 0;
+  $nextBtn.disabled = currentDay === DAYS.length - 1;
+
+  const data = loadDay(currentDay);
+  textareaIds.forEach(field => {
+    textareas[field].innerHTML = data[field];
+    autoResize(textareas[field]);
+  });
+
+  updateDayDateInput();
+  updateDoneCheckbox();
+  $contentScroll.scrollTop = 0;
+}
+
+function navigateDay(delta) {
+  if (currentView === 'supplement') {
+    var si = currentSuppIndex + delta;
+    if (si >= 0 && si < getSupplements().length) switchToSupplement(si);
+    return;
+  }
+  const newIdx = currentDay + delta;
+  if (newIdx >= 0 && newIdx < DAYS.length) {
+    switchToDay(newIdx);
+  }
+}
+
+function updateProgress() {
+  const completed = countCompletedDays();
+  const pct = Math.round((completed / DAYS.length) * 100);
+  $progressBar.style.width = pct + '%';
+  $progressText.textContent = `已完成 ${completed} / 78 天`;
+  // Update dots in sidebar
+  renderSidebarDotForDay(currentDay);
+  // Re-render all sidebar dots
+  document.querySelectorAll('.day-link').forEach(link => {
+    var numEl = link.querySelector('.day-num');
+    if (!numEl) return; // skip supplement links
+    const dayNum = parseInt(numEl.textContent.replace('Day ',''));
+    const idx = DAYS.findIndex(d => d.day === dayNum);
+    if (idx >= 0) {
+      const dot = link.querySelector('.dot');
+      if (dot) {
+        dot.className = 'dot ' + (isDayComplete(idx) ? 'filled' : '');
+      }
+    }
+  });
+  // Refresh calendar dots
+  renderCalendar();
+}
+
+function renderSidebarDotForDay(dayIndex) {
+  // Just update the whole sidebar for consistency — called from updateProgress already
+}
+
+/* ============================================
+   CALENDAR (compact strip, per-day dates)
+   ============================================ */
+function getDayDate(dayIndex) {
+  return localStorage.getItem(STORAGE_PREFIX + 'd' + DAYS[dayIndex].day + '_date') || null;
+}
+function setDayDate(dayIndex, dateStr) {
+  if (!dateStr) { clearDayDate(dayIndex); return; }
+  localStorage.setItem(STORAGE_PREFIX + 'd' + DAYS[dayIndex].day + '_date', dateStr);
+  renderCalendar();
+  updateDayDateInput();
+}
+function clearDayDate(dayIndex) {
+  localStorage.removeItem(STORAGE_PREFIX + 'd' + DAYS[dayIndex].day + '_date');
+  renderCalendar();
+  updateDayDateInput();
+  document.getElementById('dayDateInput').value = '';
+  document.getElementById('dayDateClear').classList.remove('has-date');
+}
+
+function updateDayDateInput() {
+  const input = document.getElementById('dayDateInput');
+  const clearBtn = document.getElementById('dayDateClear');
+  if (!input || !clearBtn) return;
+  const dateVal = getDayDate(currentDay);
+  input.value = dateVal || '';
+  if (dateVal) clearBtn.classList.add('has-date');
+  else clearBtn.classList.remove('has-date');
+}
+
+function renderSupplement() {
+  var si = currentSuppIndex;
+  var supplements = getSupplements();
+  var s = supplements[si];
+  if (!s) { switchToDay(0); return; }
+  $dayNum.textContent = '📚';
+  $dayTitleBoth.textContent = s.author;
+  document.title = s.author + ' — 补充阅读';
+  $prevBtn.disabled = si === 0;
+  $nextBtn.disabled = si === supplements.length - 1;
+
+  document.getElementById('cardsGrid').style.display = 'none';
+  var view = document.getElementById('supplementView');
+  view.style.display = 'block';
+
+  var savedContent = localStorage.getItem(suppKey(si));
+  var content = savedContent !== null ? savedContent : (s.content || '');
+
+  var html = '<div class="supp-card">';
+  html += '<h2 class="supp-title"><div class="editable" contenteditable="true" id="suppTitleEdit" onblur="saveSuppTitle(' + si + ')" style="min-height:auto;padding:4px 8px;font-weight:700;font-size:1.1rem;">' + s.title + '</div></h2>';
+  html += '<div class="editable text-en" contenteditable="true" id="suppContentEdit" oninput="autoSaveSuppContent(' + si + ')" style="min-height:300px;padding:16px 18px;line-height:1.8;">' + content + '</div>';
+  html += '</div>';
+  view.innerHTML = html;
+}
+
+function suppKey(suppIndex) {
+  return STORAGE_PREFIX + 'supp_content_' + suppIndex;
+}
+function suppMetaKey() {
+  return STORAGE_PREFIX + 'supplements';
+}
+
+function autoSaveSuppContent(si) {
+  clearTimeout(window._suppSaveTimer);
+  window._suppSaveTimer = setTimeout(function(){
+    var el = document.getElementById('suppContentEdit');
+    if (!el) return;
+    var val = el.innerHTML;
+    if (val && val.replace(/\s/g,'') !== '') {
+      localStorage.setItem(suppKey(si), val);
+    } else {
+      localStorage.removeItem(suppKey(si));
+    }
+  }, 500);
+}
+
+function saveSuppTitle(si) {
+  var el = document.getElementById('suppTitleEdit');
+  if (!el) return;
+  var val = el.textContent.trim();
+  if (!val) return;
+  var supplements = getSupplements();
+  supplements[si].title = val;
+  saveSupplementsMeta(supplements);
+  renderSidebar();
+}
+
+function saveSupplementsMeta(supplements) {
+  var customs = [];
+  for (var i = DEFAULT_SUPPLEMENTS.length; i < supplements.length; i++) {
+    customs.push(supplements[i]);
+  }
+  if (customs.length > 0) {
+    localStorage.setItem(suppMetaKey(), JSON.stringify(customs));
+  } else {
+    localStorage.removeItem(suppMetaKey());
+  }
+}
+
+function addSupplement() {
+  var author = prompt('作者/书名：', '');
+  if (!author || !author.trim()) return;
+  var supplements = getSupplements();
+  supplements.push({ id: 'custom_' + Date.now(), author: author.trim(), title: author.trim(), content: '' });
+  saveSupplementsMeta(supplements);
+  switchToSupplement(supplements.length - 1);
+}
+
+function deleteSupplement(si) {
+  var supplements = getSupplements();
+  if (si < DEFAULT_SUPPLEMENTS.length) return;
+  if (!confirm('删除「' + supplements[si].author + '」？此操作不可撤销。')) return;
+  localStorage.removeItem(suppKey(si));
+  supplements.splice(si, 1);
+  saveSupplementsMeta(supplements);
+  currentSuppIndex = 0;
+  renderSidebar();
+  switchToSupplement(0);
+}
+
+function renderCalendar() {
+  const container = document.getElementById('calCells');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const monthNames = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  let lastMonth = -1, lastYear = -1;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  DAYS.forEach((d, idx) => {
+    const dateStr = getDayDate(idx);
+
+    // Insert month separator if this day has a date and it's a new month
+    if (dateStr) {
+      const dt = new Date(dateStr + 'T00:00:00');
+      const m = dt.getMonth(), y = dt.getFullYear();
+      if (m !== lastMonth || y !== lastYear) {
+        lastMonth = m; lastYear = y;
+        const sep = document.createElement('span');
+        sep.className = 'cal-strip-month-sep';
+        container.appendChild(sep);
+        const label = document.createElement('span');
+        label.className = 'cal-strip-month-label';
+        label.textContent = y + '年' + monthNames[m];
+        container.appendChild(label);
+      }
+    }
+
+    const cell = document.createElement('button');
+    cell.className = 'cal-strip-cell';
+    cell.textContent = d.day;
+    if (dateStr) {
+      cell.title = 'Day ' + d.day + ' — ' + d.titleEn + ' / ' + d.titleCn + ' [' + dateStr + ']';
+      // Check if this date is today
+      const dt = new Date(dateStr + 'T00:00:00');
+      if (dt.getTime() === today.getTime()) {
+        cell.classList.add('today-mark');
+      }
+    } else {
+      cell.title = 'Day ' + d.day + ' — ' + d.titleEn + ' / ' + d.titleCn + ' (未设日期)';
+    }
+    if (isDayComplete(idx)) cell.classList.add('filled');
+    if (idx === currentDay) cell.classList.add('current');
+
+    cell.onclick = () => switchToDay(idx);
+    container.appendChild(cell);
+  });
+}
+
+/* ============================================
+   AUTOSAVE
+   ============================================ */
+const saveTimers = {};
+function autoResize(ta) {
+  if (!ta) return;
+  requestAnimationFrame(function(){
+    ta.style.height = 'auto';
+    var h = ta.scrollHeight;
+    if (h < 80) h = 80;
+    ta.style.height = h + 'px';
+  });
+}
+textareaIds.forEach(field => {
+  var el = textareas[field];
+  el.addEventListener('input', function() {
+    autoResize(this);
+    clearTimeout(saveTimers[field]);
+    saveTimers[field] = setTimeout(() => {
+      saveField(currentDay, field, this.innerHTML);
+    }, 500);
+  });
+  el.addEventListener('focus', function() { showToolbarFor(this); });
+  el.addEventListener('blur', function() { setTimeout(hideToolbar, 150); });
+});
+
+// Editable title save
+if ($dayTitleBoth) $dayTitleBoth.addEventListener('blur', function() {
+  var d = DAYS[currentDay];
+  var txt = this.textContent.trim();
+  if (txt && txt !== (d.titleEn + ' / ' + d.titleCn)) {
+    localStorage.setItem(STORAGE_PREFIX + 'd' + d.day + '_title', txt);
+  } else if (!txt || txt === (d.titleEn + ' / ' + d.titleCn)) {
+    localStorage.removeItem(STORAGE_PREFIX + 'd' + d.day + '_title');
+  }
+  renderSidebar();
+});
+
+function saveCurrentContent() {
+  textareaIds.forEach(field => {
+    saveField(currentDay, field, textareas[field].innerHTML);
+  });
+  // Clear any pending timers
+  textareaIds.forEach(field => clearTimeout(saveTimers[field]));
+}
+
+// Save before unload
+window.addEventListener('beforeunload', () => saveCurrentContent());
+window.addEventListener('resize', () => {
+  textareaIds.forEach(field => { if (textareas[field]) autoResize(textareas[field]); });
+});
+
+/* ============================================
+   FORMAT TOOLBAR
+   ============================================ */
+var activeEditor = null;
+var toolbar = document.getElementById('formatToolbar');
+
+function showToolbarFor(el) {
+  activeEditor = el;
+  if (!toolbar) return;
+  var rect = el.getBoundingClientRect();
+  toolbar.style.top = (rect.top + window.scrollY - 8) + 'px';
+  toolbar.style.left = (rect.left + 8) + 'px';
+  toolbar.classList.add('show');
+}
+function hideToolbar() {
+  // Small delay so click on toolbar button registers before hiding
+  setTimeout(function(){
+    if (document.activeElement !== activeEditor || !activeEditor) {
+      if (toolbar) toolbar.classList.remove('show');
+    }
+  }, 200);
+}
+// Keep toolbar visible when hovering it
+if (toolbar) {
+  toolbar.addEventListener('mouseenter', function(){ toolbar.classList.add('show'); });
+  toolbar.addEventListener('mouseleave', function(){ hideToolbar(); });
+}
+
+function fmt(cmd) {
+  if (!activeEditor) return;
+  activeEditor.focus();
+  if (cmd === 'highlight') {
+    // Toggle highlight: wrap selection in <span class="hl">
+    var sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    var range = sel.getRangeAt(0);
+    if (range.collapsed) return; // nothing selected
+    // Check if already inside a .hl span
+    var node = range.commonAncestorContainer;
+    var hlSpan = node.nodeType===3 ? node.parentElement.closest('.hl') : node.closest('.hl');
+    if (hlSpan) {
+      // Remove highlight: unwrap
+      var parent = hlSpan.parentNode;
+      while (hlSpan.firstChild) parent.insertBefore(hlSpan.firstChild, hlSpan);
+      parent.removeChild(hlSpan);
+      parent.normalize();
+    } else {
+      // Wrap in highlight span
+      var span = document.createElement('span');
+      span.className = 'hl';
+      try { range.surroundContents(span); } catch(e) {
+        // Fallback for complex selections
+        var contents = range.extractContents();
+        span.appendChild(contents);
+        range.insertNode(span);
+      }
+    }
+    sel.removeAllRanges();
+  } else {
+    document.execCommand(cmd, false, null);
+  }
+  activeEditor.dispatchEvent(new Event('input', {bubbles:true}));
+  activeEditor.focus();
+}
+
+// Keyboard: Ctrl+B/I/U for formatting; Arrow keys for navigation (only when NOT editing)
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && (e.key === 'b' || e.key === 'i' || e.key === 'u')) {
+    // Allow default browser behavior for contenteditable (execCommand)
+    return;
+  }
+  if (document.activeElement && document.activeElement.isContentEditable) return;
+  if (e.key === 'ArrowLeft') navigateDay(-1);
+  if (e.key === 'ArrowRight') navigateDay(1);
+});
+
+/* ============================================
+   SIDEBAR MOBILE
+   ============================================ */
+function openSidebar() {
+  $sidebar.classList.add('open');
+  $sidebarOverlay.classList.add('show');
+}
+function closeSidebar() {
+  $sidebar.classList.remove('open');
+  $sidebarOverlay.classList.remove('show');
+}
+$mobileMenuBtn.addEventListener('click', () => {
+  if ($sidebar.classList.contains('open')) closeSidebar();
+  else openSidebar();
+});
+$sidebarOverlay.addEventListener('click', closeSidebar);
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  // Don't navigate if user is editing
+  if (document.activeElement && document.activeElement.isContentEditable) return;
+  if (e.key === 'ArrowLeft') navigateDay(-1);
+  if (e.key === 'ArrowRight') navigateDay(1);
+});
+
+/* ============================================
+   EXPORT
+   ============================================ */
+function stripHtml(html) {
+  if (!html) return '';
+  var div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent || div.innerText || '';
+}
+
+function exportAll() {
+  saveCurrentContent();
+  let output = '';
+  output += '═══════════════════════════════════════════\n';
+  output += '  Reality Transurfing 阅读日志\n';
+  output += '  78天 · 重新创造现实\n';
+  output += '  导出日期: ' + new Date().toLocaleDateString('zh-CN') + '\n';
+  output += '═══════════════════════════════════════════\n\n';
+
+  DAYS.forEach((d, idx) => {
+    const data = loadDay(idx);
+    const hasContent = textareaIds.some(f => data[f] && stripHtml(data[f]).trim());
+    if (!hasContent) return;
+
+    const studyDate = getDayDate(idx);
+    output += '───────────────────────────────────────────\n';
+    output += `Day ${d.day} — ${d.titleEn} / ${d.titleCn}`;
+    if (studyDate) output += ` [学习日期: ${studyDate}]`;
+    output += '\n';
+    output += '───────────────────────────────────────────\n\n';
+
+    const fields = [
+      ['【Principle】', 'principleEn'],
+      ['【Interpretation】', 'interpretationEn'],
+      ['【原则】', 'principleCn'],
+      ['【解读】', 'interpretationCn'],
+      ['【疑问】', 'questions'],
+      ['【反思】', 'reflections'],
+      ['【总结】', 'summary']
+    ];
+    fields.forEach(function(f) {
+      var txt = stripHtml(data[f[1]]).trim();
+      if (txt) output += f[0] + '\n' + txt + '\n\n';
+    });
+    output += '\n';
+  });
+
+  // Download
+  const blob = new Blob([output], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Reality_Transurfing_阅读日志_' + new Date().toISOString().slice(0,10) + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importAll(fileInput) {
+  const file = fileInput.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    // Parse the exported format: look for "Day N — TitleEn / TitleCn" markers
+    const dayBlocks = text.split(/───────────────────────────────────────────\nDay \d+ — /);
+    if (dayBlocks.length < 2) {
+      alert('文件格式不正确，无法导入。');
+      return;
+    }
+    let imported = 0;
+    for (let i = 1; i < dayBlocks.length; i++) {
+      const block = dayBlocks[i];
+      // Extract day number from the header line
+      const headerMatch = block.match(/^(\d+)/);
+      if (!headerMatch) continue;
+      const dayNum = parseInt(headerMatch[1]);
+      const idx = DAYS.findIndex(d => d.day === dayNum);
+      if (idx < 0) continue;
+
+      // Extract study date from header line: [学习日期: YYYY-MM-DD]
+      const dateMatch = block.match(/\[学习日期:\s*(\d{4}-\d{2}-\d{2})\]/);
+      if (dateMatch) {
+        localStorage.setItem(STORAGE_PREFIX + 'd' + dayNum + '_date', dateMatch[1]);
+      }
+
+      // Extract each section
+      const sections = {
+        principleEn:      extractSection(block, '【Principle】'),
+        interpretationEn: extractSection(block, '【Interpretation】'),
+        principleCn:      extractSection(block, '【原则】'),
+        interpretationCn: extractSection(block, '【解读】'),
+        questions:        extractSection(block, '【疑问】'),
+        reflections:      extractSection(block, '【反思】'),
+        summary:          extractSection(block, '【总结】'),
+      };
+      // Also try old format markers for backward compat
+      if (!sections.principleEn.trim()) sections.principleEn = extractSection(block, '【English Original】');
+      if (!sections.principleCn.trim()) sections.principleCn = extractSection(block, '【中文翻译】');
+
+      let saved = false;
+      for (const [field, value] of Object.entries(sections)) {
+        if (value.trim()) {
+          localStorage.setItem(storageKey(idx, field), value.trim());
+          saved = true;
+        }
+      }
+      if (saved) imported++;
+    }
+    fileInput.value = '';
+    renderSidebar();
+    renderMain();
+    updateProgress();
+    alert('导入完成！已恢复 ' + imported + ' 天的内容。');
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+function extractSection(text, marker) {
+  const startIdx = text.indexOf(marker);
+  if (startIdx === -1) return '';
+  const afterMarker = text.substring(startIdx + marker.length);
+  // Find the next section marker or day separator
+  const nextMarkers = ['【Principle】','【Interpretation】','【English Original】','【原则】','【解读】','【中文翻译】','【疑问】','【反思】','【总结】','───────────────────────────────────────────','═══════════════════════════════════════════'];
+  let endIdx = afterMarker.length;
+  for (const m of nextMarkers) {
+    const pos = afterMarker.indexOf(m);
+    if (pos !== -1 && pos < endIdx) endIdx = pos;
+  }
+  return afterMarker.substring(0, endIdx).trim();
+}
+
+function resetAll() {
+  if (!confirm('确认要清除所有 78 天的本地保存内容吗？此操作不可撤销。')) return;
+  for (let i = 0; i < DAYS.length; i++) {
+    textareaIds.forEach(field => {
+      localStorage.removeItem(storageKey(i, field));
+    });
+    localStorage.removeItem(STORAGE_PREFIX + 'd' + DAYS[i].day + '_date');
+    localStorage.removeItem(doneKey(i));
+  }
+  localStorage.removeItem(STORAGE_PREFIX + 'currentDay');
+  // Clear supplement data
+  var supps = getSupplements();
+  for (var si = 0; si < supps.length; si++) {
+    localStorage.removeItem(suppKey(si));
+  }
+  localStorage.removeItem(suppMetaKey());
+  document.getElementById('dayDateInput').value = '';
+  document.getElementById('dayDateClear').classList.remove('has-date');
+  renderSidebar();
+  renderMain();
+  renderCalendar();
+  updateProgress();
+}
+
+/* ============================================
+   AI CHAT LAUNCHER (ChatGPT + DeepSeek)
+   ============================================ */
+var chatModel = localStorage.getItem(STORAGE_PREFIX + 'chatModel') || 'gpt';
+
+function setChatModel(model) {
+  chatModel = model;
+  localStorage.setItem(STORAGE_PREFIX + 'chatModel', model);
+  document.getElementById('chatModelGpt').classList.toggle('active', model === 'gpt');
+  document.getElementById('chatModelDs').classList.toggle('active', model === 'deepseek');
+  var hint = document.getElementById('chatHint');
+  if (model === 'deepseek') {
+    hint.textContent = '输入问题 → 自动复制内容 → 打开 DeepSeek → 粘贴发送';
+  } else {
+    hint.textContent = '输入问题 → 自动复制内容 → 打开 ChatGPT → 粘贴发送';
+  }
+}
+
+function chatStorageKey() {
+  return STORAGE_PREFIX + 'chat_' + DAYS[currentDay].day;
+}
+
+function loadChatHistory() {
+  var raw = localStorage.getItem(chatStorageKey());
+  return raw ? JSON.parse(raw) : [];
+}
+
+function saveChatHistory(msgs) {
+  if (msgs.length === 0) localStorage.removeItem(chatStorageKey());
+  else localStorage.setItem(chatStorageKey(), JSON.stringify(msgs));
+}
+
+function renderChat() {
+  var msgs = loadChatHistory();
+  var container = document.getElementById('chatMessages');
+  if (!container) return;
+  if (msgs.length === 0) {
+    container.innerHTML = '<div class="chat-msg assistant">输入你想问的问题，点击发送。我会把当前 Day 的 Principle + Interpretation 连同你的问题一起复制，然后打开 ChatGPT 网页。你在 ChatGPT 里 Ctrl+V 粘贴即可。</div>';
+  } else {
+    container.innerHTML = msgs.map(function(m){
+      return '<div class="chat-msg user">' + m.content.replace(/\n/g,'<br>') + '</div>';
+    }).join('');
+  }
+  container.scrollTop = container.scrollHeight;
+}
+
+function addChatQuestion(content) {
+  var msgs = loadChatHistory();
+  msgs.push({ content: content });
+  if (msgs.length > 30) msgs = msgs.slice(msgs.length - 30);
+  saveChatHistory(msgs);
+  renderChat();
+}
+
+function buildChatPrompt(userQuestion) {
+  var d = DAYS[currentDay];
+  var prompt = '我在读 Vadim Zeland 的《Transurfing in 78 Days》。\n\n';
+  prompt += '现在是 Day ' + d.day + '：' + d.titleEn + ' / ' + d.titleCn + '\n\n';
+  var pe = (textareas['principleEn'].innerHTML || '').replace(/<[^>]*>/g,'').trim();
+  var ie = (textareas['interpretationEn'].innerHTML || '').replace(/<[^>]*>/g,'').trim();
+  var pc = (textareas['principleCn'].innerHTML || '').replace(/<[^>]*>/g,'').trim();
+  var ic = (textareas['interpretationCn'].innerHTML || '').replace(/<[^>]*>/g,'').trim();
+  if (pe) prompt += '=== Principle ===\n' + pe + '\n\n';
+  if (ie) prompt += '=== Interpretation ===\n' + ie + '\n\n';
+  if (pc) prompt += '=== 原则（中文）===\n' + pc + '\n\n';
+  if (ic) prompt += '=== 解读（中文）===\n' + ic + '\n\n';
+  prompt += '---\n';
+  prompt += '请用中文回复。我的问题是：\n' + userQuestion;
+  return prompt;
+}
+
+function sendChat() {
+  var input = document.getElementById('chatInput');
+  var userMsg = input.value.trim();
+  if (!userMsg) return;
+
+  addChatQuestion(userMsg);
+  var fullPrompt = buildChatPrompt(userMsg);
+
+  // Copy to clipboard
+  var targetUrl = chatModel === 'deepseek' ? 'https://chat.deepseek.com' : 'https://chatgpt.com';
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(fullPrompt).then(function(){
+      window.open(targetUrl, '_blank');
+    }).catch(function(){
+      fallbackCopy(fullPrompt, targetUrl);
+    });
+  } else {
+    fallbackCopy(fullPrompt, targetUrl);
+  }
+
+  input.value = '';
+}
+
+function fallbackCopy(text, url) {
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+  window.open(url, '_blank');
+}
+
+function clearChatHistory() {
+  if (!confirm('清空 Day ' + DAYS[currentDay].day + ' 的问题记录？')) return;
+  localStorage.removeItem(chatStorageKey());
+  renderChat();
+}
+
+function toggleChat() {
+  var panel = document.getElementById('chatPanel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    setChatModel(chatModel);
+    updateChatDayLabel();
+    renderChat();
+  }
+}
+
+function updateChatDayLabel() {
+  var lbl = document.getElementById('chatDayLabel');
+  if (lbl) lbl.textContent = 'Day ' + DAYS[currentDay].day;
+}
+
+var _origSwitchToDay2 = switchToDay;
+switchToDay = function(idx) {
+  _origSwitchToDay2(idx);
+  updateChatDayLabel();
+  renderChat();
+};
+
+/* ============================================
+   FOCUS MODE
+   ============================================ */
+function toggleFocusMode() {
+  var isFocus = document.body.classList.toggle('focus-mode');
+  var btn = document.getElementById('focusBtn');
+  if (btn) {
+    btn.textContent = isFocus ? '🧘 专注中' : '🧘 专注';
+    btn.classList.toggle('active', isFocus);
+  }
+  localStorage.setItem(STORAGE_PREFIX + 'focusMode', isFocus ? '1' : '0');
+}
+
+function restoreFocusMode() {
+  if (localStorage.getItem(STORAGE_PREFIX + 'focusMode') === '1') {
+    document.body.classList.add('focus-mode');
+    var btn = document.getElementById('focusBtn');
+    if (btn) { btn.textContent = '🧘 专注中'; btn.classList.add('active'); }
+  }
+}
+
+/* ============================================
+   GITHUB GIST CLOUD SYNC
+   ============================================ */
+var gistTokenKey = STORAGE_PREFIX + 'gist_token';
+var gistIdKey = STORAGE_PREFIX + 'gist_id';
+var cloudEnabled = false;
+
+function getGistToken() { return localStorage.getItem(gistTokenKey) || ''; }
+function getGistId() { return localStorage.getItem(gistIdKey) || ''; }
+
+function setupCloud() {
+  var token = prompt('请输入 GitHub Personal Access Token（仅需设置一次）：\n\n获取方式：github.com → Settings → Developer settings → Personal access tokens → Generate new token（选 classic）→ 勾选 gist 权限 → 生成后复制到这里', getGistToken());
+  if (!token || !token.trim()) return;
+  token = token.trim();
+  localStorage.setItem(gistTokenKey, token);
+  cloudEnabled = true;
+  updateCloudUI();
+  alert('Token 已保存！数据将自动同步到 GitHub Gist。\n\n换设备时：输入相同的 Token，点 ☁️ 下载按钮即可恢复数据。');
+}
+
+function disableCloud() {
+  if (!confirm('断开云同步？本地数据不会丢失。')) return;
+  localStorage.removeItem(gistTokenKey);
+  localStorage.removeItem(gistIdKey);
+  cloudEnabled = false;
+  updateCloudUI();
+}
+
+function updateCloudUI() {
+  var btn = document.getElementById('cloudBtn');
+  var info = document.getElementById('cloudInfo');
+  if (cloudEnabled) {
+    if (btn) btn.textContent = '☁️';
+    if (info) info.textContent = '云同步中';
+  } else {
+    if (btn) btn.textContent = '☁️';
+    if (info) info.textContent = '';
+  }
+  var setupBtn = document.getElementById('cloudSetupBtn');
+  if (setupBtn) setupBtn.textContent = cloudEnabled ? '设置' : '设置';
+}
+
+function collectAllData() {
+  var payload = {
+    days: {},
+    supplements: { customs: localStorage.getItem(suppMetaKey()) || null },
+    suppContents: {},
+    currentDay: localStorage.getItem(STORAGE_PREFIX + 'currentDay') || '1',
+    focusMode: localStorage.getItem(STORAGE_PREFIX + 'focusMode') || '0'
+  };
+  for (var i = 0; i < DAYS.length; i++) {
+    var d = DAYS[i];
+    var entry = {};
+    textareaIds.forEach(function(f){
+      var v = localStorage.getItem(storageKey(i, f));
+      if (v) entry[f] = v;
+    });
+    var done = localStorage.getItem(doneKey(i));
+    if (done) entry._done = done;
+    var sd = localStorage.getItem(STORAGE_PREFIX + 'd' + d.day + '_date');
+    if (sd) entry._date = sd;
+    var t = localStorage.getItem(STORAGE_PREFIX + 'd' + d.day + '_title');
+    if (t) entry._title = t;
+    if (Object.keys(entry).length > 0) payload.days['d' + d.day] = entry;
+  }
+  // Supplement contents
+  var supps = getSupplements();
+  for (var si = 0; si < supps.length; si++) {
+    var sc = localStorage.getItem(suppKey(si));
+    if (sc) payload.suppContents['s' + si] = sc;
+  }
+  return payload;
+}
+
+function restoreAllData(payload) {
+  if (!payload) return;
+  if (payload.currentDay) localStorage.setItem(STORAGE_PREFIX + 'currentDay', payload.currentDay);
+  if (payload.focusMode) localStorage.setItem(STORAGE_PREFIX + 'focusMode', payload.focusMode);
+  if (payload.supplements && payload.supplements.customs) localStorage.setItem(suppMetaKey(), payload.supplements.customs);
+  if (payload.suppContents) {
+    Object.keys(payload.suppContents).forEach(function(k){
+      localStorage.setItem(STORAGE_PREFIX + 'supp_content_' + k.replace('s',''), payload.suppContents[k]);
+    });
+  }
+  if (payload.days) {
+    Object.keys(payload.days).forEach(function(dk){
+      var entry = payload.days[dk];
+      var dayNum = parseInt(dk.replace('d',''));
+      var idx = DAYS.findIndex(function(x){ return x.day === dayNum; });
+      if (idx < 0) return;
+      textareaIds.forEach(function(f){
+        if (entry[f]) localStorage.setItem(storageKey(idx, f), entry[f]);
+      });
+      if (entry._done) localStorage.setItem(doneKey(idx), entry._done);
+      if (entry._date) localStorage.setItem(STORAGE_PREFIX + 'd' + dayNum + '_date', entry._date);
+      if (entry._title) localStorage.setItem(STORAGE_PREFIX + 'd' + dayNum + '_title', entry._title);
+    });
+  }
+  renderSidebar();
+  renderMain();
+  renderCalendar();
+  updateProgress();
+}
+
+function uploadToCloud() {
+  if (!cloudEnabled) return;
+  var token = getGistToken();
+  if (!token) return;
+  var gistId = getGistId();
+  var payload = collectAllData();
+  var content = JSON.stringify(payload, null, 2);
+  var filename = 'transurfing-78-data.json';
+
+  var url, method;
+  if (gistId) {
+    url = 'https://api.github.com/gists/' + gistId;
+    method = 'PATCH';
+  } else {
+    url = 'https://api.github.com/gists';
+    method = 'POST';
+  }
+  var body = JSON.stringify({
+    description: 'Transurfing in 78 Days — 阅读数据',
+    public: false,
+    files: {}
+  });
+  body = JSON.parse(body);
+  body.files[filename] = { content: content };
+  body = JSON.stringify(body);
+
+  fetch(url, {
+    method: method,
+    headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+    body: body
+  }).then(function(r){ return r.json(); }).then(function(data){
+    if (data.id && !gistId) {
+      localStorage.setItem(gistIdKey, data.id);
+    }
+  }).catch(function(e){ console.log('Upload error:', e); });
+}
+
+function downloadFromCloud() {
+  var token = getGistToken();
+  if (!token) { alert('请先点击 ☁️ 旁边的"设置"按钮，输入 GitHub Token。'); return; }
+  var gistId = getGistId();
+  if (!gistId) {
+    // Try to find the gist
+    fetch('https://api.github.com/gists', {
+      headers: { 'Authorization': 'token ' + token }
+    }).then(function(r){ return r.json(); }).then(function(gists){
+      var found = null;
+      for (var i = 0; i < gists.length; i++) {
+        if (gists[i].description && gists[i].description.indexOf('Transurfing') >= 0) {
+          found = gists[i]; break;
+        }
+      }
+      if (found) {
+        localStorage.setItem(gistIdKey, found.id);
+        fetchGistContent(found.id, token);
+      } else {
+        alert('未找到云端备份。上传一次数据后即可在别的设备下载。');
+      }
+    }).catch(function(e){ alert('请求失败，请检查 Token 是否正确。'); });
+    return;
+  }
+  fetchGistContent(gistId, token);
+}
+
+function fetchGistContent(gistId, token) {
+  fetch('https://api.github.com/gists/' + gistId, {
+    headers: { 'Authorization': 'token ' + token }
+  }).then(function(r){ return r.json(); }).then(function(data){
+    var filename = 'transurfing-78-data.json';
+    var file = data.files && data.files[filename];
+    if (!file || !file.content) { alert('云端数据为空。'); return; }
+    try {
+      var payload = JSON.parse(file.content);
+      restoreAllData(payload);
+      alert('数据已从云端恢复！');
+    } catch(e) { alert('数据解析失败。'); }
+  }).catch(function(e){ alert('下载失败: ' + e.message); });
+}
+
+// Hook saveField to auto-upload
+var _origSaveField2 = saveField;
+saveField = function(dayIndex, field, value) {
+  _origSaveField2(dayIndex, field, value);
+  clearTimeout(window._cloudUploadTimer);
+  window._cloudUploadTimer = setTimeout(uploadToCloud, 3000);
+};
+
+// Init cloud
+if (getGistToken()) {
+  cloudEnabled = true;
+  updateCloudUI();
+}
+
+/* ============================================
+   INIT
+   ============================================ */
+function init() {
+  const savedDay = localStorage.getItem(STORAGE_PREFIX + 'currentDay');
+  if (savedDay !== null) {
+    const dayNum = parseInt(savedDay);
+    const idx = DAYS.findIndex(d => d.day === dayNum);
+    if (idx >= 0) currentDay = idx;
+  }
+  try { renderSidebar(); } catch(e) { alert('renderSidebar错误: '+e.message); return; }
+  try { renderMain(); } catch(e) { alert('renderMain错误: '+e.message); return; }
+  try { renderCalendar(); } catch(e) { alert('renderCalendar错误: '+e.message); return; }
+  try { updateProgress(); } catch(e) { alert('updateProgress错误: '+e.message); return; }
+  localStorage.setItem(STORAGE_PREFIX + 'currentDay', DAYS[currentDay].day);
+  restoreFocusMode();
+}
+
+/* ============================================
+   PRESET CONTENT — Days 1–20 (English)
+   ============================================ */
+var PRESET_DATA = {};
+PRESET_DATA[1]={p:"Wake up, right here, right now! Be aware and remember that everyone is a dreamer and everything that is happening around you is nothing more than a dream, only the dream no longer has any control over you. Now that you have woken up in the dream, you can influence how events will unfold. Your advantage lies in awareness. Feel your strength. Strength is always yours when you remember it. From now on, everything will be as you want it to be.",i:"Your birth into this life represents a new awakening after a series of past incarnations, dreams about reality. From the moment you appeared in the world, you have had amazing abilities. You could hear the rustling of the morning stars, see auras and communicate with birds and animals. The entire world was an astonishing extravaganza of luminous energy and you were the magician, capable of controlling it. However, you soon fell once again under the influence of others and were plunged into a dream. The dreamers constantly and intentionally focused your attention on the physical aspect of reality. As a result, your magical abilities were lost. Have you ever felt as if life were a dream in which reality is controlling you, rather than you controlling it? The time has come to reclaim your former power."};
+PRESET_DATA[2]={p:"Right now, embrace the awareness that your life is a game, which you have been pushed into playing. While you are mentally engrossed in the game, you can't objectively evaluate a situation or influence the course of events in any significant way. So first, come down into the audience hall, take a good, calm look at everything around you and say to yourself, \"In this moment, I am fully awake and aware of where I am, what is happening, what I am doing and why\". Then walk back onto the stage and continue playing your role while remaining the witness, like any other member of the audience. Now you have a huge advantage — awareness. You have hacked the game and acquired the ability to control it.",i:"When you dream, you are at the mercy of circumstance. The rational mind sleeps and accepts everything at face value as if everything were unfolding as it should. Waking life is pretty much the same. You might tend to think that reality is something that exists independently, and that you are powerless to influence it. You are mostly resigned to your lot, the set of capabilities given to you and the conditions of the environment in which you have to exist. All you can do is go with the flow that of fate, from time to time, making minor attempts to assert your rights. Is it really possible to change things? Too right, it is! And you will. Until now, you have probably perceived reality as you were taught to. Now, be aware that reality is like a dream. You can only control the situation through lucid dreaming. On stage, everyone is playing a role and all the actors are interacting with you in one way or another. They might expect something of you, make impositions, requests and demands; they may help, obstruct, love or hate you. Look at the game consciously, from a distance, and then you will understand it all."};
+PRESET_DATA[3]={p:"There is a small particle of God in every one of us. You are a child of God and your life is God's dream. By shaping your own reality with the power of intention, you fulfil God's will. Your intention is God's intention. As this is the case, how can you doubt that your intention will be realised? All it takes is to claim the right. When you ask God for something, it is just the same as if God had asked something of himself. Can God really ask something of his or her self? Is there any one person alive from whom God would ask for something for himself or herself? God just takes what he (she) wants. Do not ask, demand or strive. Shape your own reality by way of conscious intention.",i:"The world is a theatre of dreams in which God is simultaneously a member of the audience, an actor, a scriptwriter, and a producer. As a member of the audience, God observes the play that is unfolding on the stage of the world. As an actor, God feels and experiences everything in the same way as the character whose role he (she) is playing. God creates and controls reality through the intention of all living things. God placed a part of his will together with the soul in every living being and then sent them out into the dream, into life. God gave every living soul the freedom and power to create their own reality by the measure of their awareness. Practically all living beings omit to use the power of intention consciously and with clear purpose. In a state of non-lucid dreaming, it is as if they are vaguely aware of wanting something without really knowing what exactly. Their intentions are therefore blurred, vague and mostly unconscious. In this respect, man has developed little more than animals. The pendulums have not only succeeded in taking away people's awareness of their own abilities, they have perverted the very meaning of life, replacing the notion of being used of God, with worship, whereas in fact, the true goal of life and the idea of service of God consists in co-creation, creation together with God."};
+PRESET_DATA[4]={p:"In order to achieve real success, you have to stop following widely accepted stereotypes and walk your own path. Anyone who pulls out of the general system creates a new measure of success. Pendulums cannot bear individuality. They spot a rising star and have no choice but to make of them a favourite. Once a new rule has been established, the ranks make a U-turn and start following the rising star. In order to establish your own rules, you have to be yourself. You can do it. You simply have to claim the privilege. Only you can decide what privileges you may or may not enjoy.",i:"People spend their entire lives being told they are far from perfect, and that success, wealth and fame are the inheritance of the elite. Pendulums do not deny that anyone can succeed but they do carefully hide the fact that everyone has their own unique qualities and abilities. For the pendulums, individuality is like death itself. If all its adherents were to become free individuals shaking off the strings of control, the pendulum would simply fall apart. Stars are born independently but the pendulums light them up. The role model, the standard of success, is created intentionally, to drive the aspirations of the mass in one direction. In other words, the pendulum's task is to drive everyone into a single rank and force them to obey a common rule. You will achieve nothing until you realise that you have to step out of the rank and file. There is no point in playing someone else's game where you are not the one making up the rules. Whatever you do, always initiate your own game. This is the secret of success."};
+PRESET_DATA[5]={p:"The world is what you think of it. The world is a mirror that reflects your relationship to it. Life is a game in which the world puts the same riddle to all its inhabitants: \"Ok, guess, what do I look like?\" Everyone responds in their own way according to their own perception: \"You are aggressive,\" or \"you are cozy,\" or even \"cheerful, gloomy, friendly, hostile, happy, illfated.\" The interesting thing is that in this quiz, everyone is a winner. The world agrees with everyone and appears before each according to the guise that was ordered. What do you think of your world?",i:"When a person is convinced that all the best things in this world have already sold out, their shelves will remain empty. When they think that buying a high-quality item will mean standing in a huge queue and then parting with a large sum of money then that is exactly what will happen. If a person's expectations are pessimistic and riddled with doubt, then they will undoubtedly be justified. If a person expects to meet with an unfriendly environment, their misgivings will be proven true. However, when a person is imbued with the innocent thought that the world has reserved the best in life for them, this also works. The eccentric, who does not know that nothing can be achieved without a struggle, somehow finds himself or herself at the counter, where there has just been a fresh delivery as if timed especially for them. Then they suddenly learn that the first buyer gets everything for free. A long queue forms behind them of people who know that the reality of life is pretty miserable and all the other fools were just lucky. If someday when confronted with the 'realities of life' the lucky eccentric changes their opinion of the world, their reality will change accordingly and when they finally \"open their eyes to the truth,\" they will be thrown right to the very back of the queue."};
+PRESET_DATA[6]={p:"Whatever thoughts you send out into the world, they will return to you like a boomerang. What happens when you hate something? You put your heart and mind into a sense of hatred, and this clear, sharp image is reflected in the mirror and fills the entire layer of your world. As a result, you get even more worked up and increase the power of your emotion. In your mind, you feel like sending everyone to hell. \"Get lost the lot of you!\" But the mirror sends the boomerang back. You tell everyone where to get off and life sends you there instead. Beware of sending negative energy into the world mirror. If you do, you will receive the same response totally unexpectedly. By the way, love is also a boomerang!",i:"Thoughts materialise in the world mirror. For example, if you are not satisfied with your outward appearance, you will take no pleasure in looking in the mirror. You focus all your attention on the features you do not like about yourself and you state them as a fact. You have to understand that how you are reflected in the mirror corresponds to how you feel about yourself. Adopt a new rule: don't look in the mirror, peek in the mirror. Seek out the positive and ignore everything else. Pass everything you see through this filter. Concentrate your attention on the things you want. What did you use to do? You stated facts like, \"I don't like myself. I don't like my world.\" The mirror simply confirmed the fact all the more, \"It's true, that's how it is.\" Now you have a different task. Seek out the things you love and at the same time, picture the desired image in your mind. From now on, all you do is seek out and find signs that confirm evidence of positive change. You'll find that things will get better and better with each passing day. If you practice this regularly, it won't be long before your jaw will be dropping in amazement."};
+PRESET_DATA[7]={p:"People are like the little kitten that stands in front of the mirror not realising that it is looking at its own image. You might think you are at the hands of circumstance, which you are incapable of changing but this is an illusion, fake prop, which you can easily dispel if you want to. Unconsciously, you are going round in circles. You observe reality and express your relationship to it; the mirror confirms the content of your relationship to reality in waking life. It is like a closed-loop feedback system. Reality is created as a reflection of your thought forms and the nature of the thought form is, in turn, largely defined by the reflection you see in the mirror. The principle of creating your own reality lies in turning the loop in the opposite direction. Look at yourself first and only then in the mirror.",i:"When a person is attached to the mirror by their relationship to the world (a primitive response to reality), they try to chase after the reflection (equally as primitive) in an attempt to change some aspect of it. Now let's try and turn the mirror circle backwards. First, we express our relationship to the world - the mirror consolidates the content of this relationship in reality - and then we observe reality. What do we get as a result? There is no longer a primitive and powerless assertion about the reflection. This is replaced instead by a deliberate, purposeful assertion of the thought form. Instead of habitually expressing dissatisfaction about what you see in the mirror, turn away from it and start creating a picture in your mind of what you would like to see. That is the way out of the mirror maze. The world first stops and then starts to meet you half way. When you take control of your relationship to reality, outer intention will begin to work, and for outer intention, there is nothing that cannot be realised. All you have to do is switch your attention from the reflection to the image in front of it. In other words, take control of your thoughts. Don't think about the things you don't want and try to avoid; think about the things you do want and are striving to achieve."};
+PRESET_DATA[8]={p:"There are many corners of paradise in the world inhabited by 'Pink Twins'. If you want to go to one of these places, put on your 'rose-coloured glasses' and ignore everyone who tells you to remove them. The echoes of paradise rarely penetrate into everyday life. When they do, catch hold of those 'sun dogs' and keep them in your focus. They will start to appear in your life more frequently and then you will see for yourself how the layer of your world begins unexpectedly to transform.",i:"Have you ever seen it rain on a sunny day? What about two rainbows in the sky? Have you ever crossed paths with twins in pink? It is important to understand one simple thing. Whether you decorate your world in bright, rainbow colours or the darkest of shades depends entirely on your relationship to it. If the majority of your thoughts are related to negative experiences, life will get worse as each day goes by. The opposite is also true. If your soul 'sings in the rain' and 'splashes in the puddles' even when the weather is bad, the layer of your world will be filed with constant celebration. Heaven and hell do not exist somewhere out there in another dimension but here on Earth. There are places like prisons, for example, but that is not where you are; that's not your world, and yet it could become your world if you focus your attention on criminal information. Then there are events like accidents, catastrophes, natural disasters; these too could become part of your reality if you start internalising the news reports. Focus your attention deliberately and solely on the things you want to see in your world. Turn away from everything else. Close your eyes and ears to it all. Evil will never disappear from reality altogether, but it can vanish from your layer of the world. You will simply stop encountering negativity.",pc:"世界上有许多'粉红双胞胎'居住的伊甸园角落。如果你想去这些地方之一，戴上你的'玫瑰色眼镜'，无视那些叫你摘掉它的人。天堂的回音很少穿透日常生活。但当它们穿透时，抓住那些'幻日'，把它们留在你的焦点里。它们会开始更频繁地出现在你的生活中，然后你会亲眼看到，你的世界层次开始出人意料地转变。",ic:"你有没有见过晴天下的雨？天上有两道彩虹？你有没有遇到过穿粉红色的双胞胎？理解一件简单的事很重要：你是用明亮彩虹色还是最暗的阴影来装饰你的世界，完全取决于你对它的态度。如果你的大多数想法都与负面经历有关，生活就会一天比一天糟糕。反之亦然。如果你的灵魂'在雨中歌唱'、'在水坑里踩水'，即使天气不好，你的世界层次也会充满持续的庆祝。天堂和地狱并不存在于另一个维度的某个地方，而是在地球上。比如有监狱这样的地方——但你现在不在那里；那不是你的世界。然而，如果你把注意力集中在犯罪信息上，它就可能成为你的世界。还有像事故、灾难、自然灾害这样的事件——如果你开始内化新闻报道，它们也可能成为你现实的一部分。刻意地把你的注意力只集中在你希望在世界上看到的东西上。把其他一切转开。对它们闭上眼、捂住耳。邪恶永远不会从现实中完全消失，但它可以从你的世界层次中消失。你会简单地不再遇到负面事物。",q:"1. 和感恩日记一个意思吗？\n- 两者都是在做同一件事：主动转移注意力。\n- 感恩日记是'为已有的东西说谢谢'。第8课是'为你想要的东西，主动去找它正在发生的迹象'。\n\n2. 怎么理解pink twins？\n- 罕见的、美好的、超越常规的'巧合'或'小奇迹'。\n- '粉红'象征乐观（'透过玫瑰色眼镜看世界'）。'双胞胎'象征巧合、配对、同步性。\n- 这个世界上有些角落是'天堂'一样的存在——美好的事、幸运的巧合、恰到好处的时机。但这些事不常出现在日常生活中。当它们出现时，你要'抓住'它，把注意力放在上面。",s:"你是用明亮彩虹色还是最暗的阴影来装饰你的世界，完全取决于你对它的态度。刻意地把你的注意力只集中在你希望在世界上看到的东西上。把其他一切转开。对它们闭上眼、捂住耳。"};
+PRESET_DATA[9]={p:"Transurfing is pretty much impossible unless you have relatively high energy levels. As a rule, much of our energy goes on a whole gamut of unrealised plans, which are weighing us down. Goals activate the energy of intention but only if the goal is already in the process of being realised and not a project that just hangs in limbo. It is important either to discard a number of your potential plans or to take steps towards their implementation. Let yourself go. Give yourself more freedom. Make a list of the limitations that are burdening you and shake them off. When you do list, reserves of intention energy will instantly be freed and you will be able to move forward.",i:"Many people go through life, loaded on all sides with the burden of endless responsibilities, unfinished business, harsh conditions, unfulfilled plans and umpteen goals. Take a moment to feel what is weighing you down. If you think about it, you will probably find that you can let go of several lead weights without an ounce of regret. There is no point in constantly dragging them around with you if you can't realise them all. For example, \"I have to be better than everyone else; I'll prove to myself and everyone else what I am worth; all I need is victory, otherwise, I'll stop being able to respect myself; I can't afford to make mistakes\". And there are others like, stop smoking, learn a foreign language and basically, turn over a new leaf for my entire life on Monday morning. Anything that is endlessly put off until later is excess cargo. An intention must either be realised or discarded because it consumes your energy, which it would be stupid to waste. Is there one big lead weight which you have secretly been thinking of getting rid of but have not yet quite built up the courage to take the step? Imagine how light and relieved you will feel when you have done it."};
+PRESET_DATA[10]={p:"Life will give you everything you intend to have if you are convinced without reservation that it is rightfully yours. Your choice is law, subject to unconditional fulfilment. Freedom of choice, the determination to have, is created by the energy of intention. If the excess potentials of inner and outer importance consume a significant chunk of your energy, your intention will have no power. In order to let go of the seeming importance of things, be conscious of your actions and aware of the things you attribute inflated importance and the consequences of doing so. The energy of excess potential is dissipated through action. Run your goal slide in your mind and quietly place one foot in front of the other in the direction of your goal. This is all the action you need to take.",i:"How do you stop being afraid? Find a safety net, a fallback position.\nHow do you stop being anxious and worrying so much? Take action. The potentials of anxiety and worry are dissipated through action.\nHow do you stop waiting and wanting? Resign yourself to the possibility of defeat and take action. Dissolve desire and expectation through action.\nHow do you get over the issue of self-worth? Accept your worth as a statement of fact and let go of any action designed to increase it.\nHow do you stop getting so irritated? Play with the pendulum and break its game rules. By responding abnormally, you disturb the pendulum's rhythm leaving it with nothing.\nHow do you let go of feelings of guilt? Stop justifying yourself.\nHow do you cope with feelings of insult and indignation? Stop fighting and go with the variants flow.\nWhat can you do if you find it impossible to let go of feelings of resentment and anger? Allow yourself this shortcoming. Don't pressure yourself to come always out tops.\nFinally, how do you stop yourself from crumbling under the weight of serious problems? Observe the principle of coordinating intention. Instead of battling with excess potentials, take action on the grounds of purified intention. Intention is cleansed in the process of movement."};
+PRESET_DATA[11]={p:"In order to acquire confidence, you must, first of all, let go of your attachment to the need to be confident. Insecurity lies in overestimating the importance of things. I don't need confidence as a crutch because if I have no importance, I have nothing to protect and nothing to gain. I have nothing to fear and nothing to worry about. If nothing is of excessive importance to me, my world is pure and transparent. I refuse to fight and choose to go with the variants flow. I am empty so I cannot be hooked. I have no need to struggle. I quietly go my own path taking what is mine along the way. This is not a position of shaky confidence so much as a matter of calm, conscious coordination.",i:"Insecurity creates a vicious circle. The more important your goal, the greater your desire to achieve it, the greater the feeling of insecurity. The more worry and anxiety you feel about something, the quicker your fears will prove justified. The battle for self-worth drains your energy. Feelings of guilt can turn a life into the wretched existence of a loser. How do you break out of this tangled maze? You can't. There is no way out. The secret of the maze is that when you stop looking for the way out and let go of the importance of things, the walls of the maze collapse all by themselves. Stop fighting to prove your sense of worth and it will surely be returned to you. Stop justifying yourself to others and you will stop feeling guilty. In the same way, if you reduce the importance you attach to external objects, you will no longer be dominated by their apparent, great significance. Finally, perfect coordination is achieved when the heart and mind are in harmony. To achieve this, listen to the dictates of your heart and stay true to your own beliefs."};
+PRESET_DATA[12]={p:"When you find yourself in balance and harmony with the world around you, your life runs smoothly and pleasantly. You achieve your goals without any particular effort. Yet, when you build walls of excess potential, life becomes a battle with balancing forces. When you are faced with a difficult situation, try and recognise where you have gone over the top, what you have become obsessed with, and to what person or thing you might have attributed excessive significance. Define your worth and then let it go. The wall will come tumbling down, the obstacle will remove itself and the problem will be solved of its own accord. Do not try to overcome obstacles. Instead, drop their importance.",i:"Everything in life strives towards balance. Wherever there is excess energetic potential, balancing forces appear with the purpose of eliminating it. When you perceive something as being excessively significant, you get the opposite result to what you intended. For example, when you are critical of yourself you come into conflict with your soul. Balancing forces make you struggle with your shortcomings and try to hide them, as a result of which, they stand out even more. When you are critical of the world, you confront a large number of pendulums. Balancing forces will aim to cut you down to size and push you away. As well as dropping importance, don't push too hard. Reducing outer importance does not mean to disdain things or underestimate them. It is more about not taking life so seriously. Do not disregard things in life, but don't paint them in a saccharine veneer either. Accept the world for what it is. Reducing inner importance is nothing at all like being submissive or self-abasing. Do not embellish or belittle your own strengths and weaknesses. Just give yourself the luxury of being yourself."};
+PRESET_DATA[13]={p:"What is the secret of charismatic personalities? They throw the negative slides out of their mind and replace them with positive ones. Charm is a result of the mutual love that exists between the heart and the mind. A charming personality experiences a feeling of joy in their soul; they enjoy life and bathe in their own love without the slightest hint of narcissism. It is this feeling of joy that other people notice. There are not many people like this but you can become one of them. You just have to turn to face your heart, love yourself and step onto the path towards your own personal goal. Not only do certain personal qualities then change but the body becomes more attractive too, the face more appealing and one's smile, absolutely dazzling.",i:"The secret to attractiveness lies in the unity of heart and mind. When a person accepts themselves as they really are, loves themselves and does what they love doing, they radiate an inner light and live their life true to their own credo. This is precisely what people lack and that is why they are drawn to charismatic individuals, like moths to a light bulb. On an energetic level, charm represents pure waves of unity of heart and mind. By training your energy, you develop the extraordinary ability to influence others around you and win them over. A person who has an abundance of free energy generates interest and goodwill in others. If you find it difficult to love yourself unconditionally, start doing an energy field workout by affirming the thought form, \"I am spilling over with energy. The intensity of my energy levels is increasing. I have a powerful energy field and it becomes more powerful every day. I shine with the energy of love and charm. I am a pure energy source. People sense my energy field and are well disposed towards me\". When you notice people genuinely feeling drawn towards you, don't forget to tell yourself that the technique is actually working. The rational mind needs to hear you affirming it because it is constantly in doubt: \"Can I really be capable of that?\""};
+PRESET_DATA[14]={p:"If you don't love yourself, no one else will, and what's more, you will never be happy. Any conflict between the heart and mind reflects negatively on a person's appearance and character. Correspondingly, the shades of your personal world will turn ever darker. Above all, love yourself, and only then pay attention to the positive qualities of others. It is important to feel and understand the following: pendulums force you to change, to turn away from your heart and follow the rule that states, 'they are better than you, so do what they do, be like them, take your place in the matrix, be nothing more than a cog.' In reality, you are unique. Go inside, accept yourself as you really are, and assert the right to be right. Then you will have something of which you can be proud and a reason to respect yourself.",i:"Once a person has gone a long way down the road of conforming to other people's standards, it is difficult for them to start suddenly loving themselves. \"How can I love myself if I don't even like myself?\" This is pure excess potential born of inflated inner and outer importance. It is outer importance in that you perceive someone else's standards as the epitome of perfection. Are you not perhaps valuing other people's qualities too highly? Inner importance is present in forcing yourself to follow other people's standards. Who says that you are any less worthy than they are? Is your self-esteem perhaps a little too low? To love yourself, kick outer importance off the pedestal and give up the idol worship. Who is stopping you from setting your own standards? Let others chase after you instead! Drop your own inner importance and let yourself go. Give yourself the luxury of having shortcomings and focus your attention on your strengths."};
+PRESET_DATA[15]={p:"If you have been ditched and are suffering from unrequited love or if you are looking for love, you must, first of all, love yourself. If you do not yet feel that you can love yourself just as you are, start taking care of yourself and focusing on your own personal development: enrol at a sports centre, commit to studying a foreign language, try dressing differently, not in your usual style, get a magic tattoo, find a magic talisman - a pendant or ring. When you start taking care of yourself, you will find a new sense of purpose. Looking after yourself could become your goal if you have not already found one. This is a truly worthy goal and it will bring you success and abundance. You deserve the very best.",i:"It is human nature that people are only pleased with themselves when other people happen to be pleased with them and that they only love themselves when others love them. And yet, the world is a mirror. How can there be love in the reflection if the image itself does not contain it? The mirror cannot reflect what isn't there. It's a vicious mirror circle. So, how do you break it? Very simply. Firstly, it is a well-known fact that we love the people we take care of. So, pay more attention to yourself, take care of yourself, take some 'me time'. Secondly, love is like a boomerang. If you send love out into the world, it will come back to you. You will experience love, including love for yourself if you shine with love instead of emanating fear, mistrust, and disapproval. If you take the first step, the reflection will meet you half way. It is basically a feedback chain: I send love out to the world – love is reflected and comes back to me – the world reciprocates – I am loved – it follows that I like myself too and begin to love myself."};
+PRESET_DATA[16]={p:"'According to your faith let it be to you'. This has been said before and more than once, and it really is true. But how do you start believing it? It is useless trying to persuade or convince yourself that it is true. Instead, get down to something concrete i.e. shaping your reality according to the Transurfing principles and visualising your goal slide. Put the principles into practice and you will see what happens. Outer intention will open a door onto the world in which the impossible becomes possible. When the mind is faced with fact, it will include the inconceivable into its world-view and allow a miracle to happen. When you see that Transurfing works, you won't need to have faith. You will have knowledge instead.",i:"Transurfing gives you a map of the territory and the rules of the game. It is up to you, what you decide to do with them. You are the king (or queen) of your personal world. Do not succumb to other's influence. Believe in yourself. Don't rely on other people's decisions. You know better than anyone else what needs to happen and how. Even now that you have knowledge, you will not be immune from making mistakes. True success grows out of the ruins of your failures. Most prominent figures have been through a lot. It is just that these areas of their life tend to be glossed over. So if you have suffered a failure, rejoice, you are on the path to success. Sometimes you will feel as if circumstances are stacked against you and yet, how can you really know, exactly which path will lead you to achieve your goal? The guardians of ancient knowledge have revealed Transurfing not to try and make you believe in the reality of metaphysics but to inspire hope. Where there is faith, there is always room for doubt. We need hope so that we can start to take action. Begin to take action and you will see how things that previously seemed inconceivable begin to manifest into physical reality. When hope has done its work, you will gain awareness. Then you will say to yourself, \"I don't wish, I don't believe, I don't hope – I intend and I know.\""};
+PRESET_DATA[17]={p:"The sense of guilt always generates scenarios related to punishment, without you realising it. This is typical of the usual worldview. Every crime is always punished. As soon as you notice the slightest trace of guilt, get rid of that rubbish immediately. Do not let it spoil your life. Live true to your own convictions and you will never experience guilt. No one will dare to judge you if you do not consider yourself guilty. When you are free of guilt, you will never find yourself in a situation in which someone tries to threaten you with violence. No guilt, no punishment.",i:"If you are struggling to shift a guilt complex, it is important to stop justifying yourself. This is one of those cases where treating the symptoms of the disease successfully deals with the cause. You do not have to convince yourself that you are not obligated to anyone. Simply observe your everyday actions. This requires a certain level of awareness. If previously you had the habit of apologising for the slightest thing, adopt a different habit. Explain your actions only when it is absolutely necessary. Stop feeling as though you owe something to others. Even if the feeling of being obligated continues, do not show it outwardly. When they stop getting the former knee-jerk reaction, the manipulators will gradually back off. At the same time, the heart and the mind will gradually get used to the new sensation. If you are not trying to justify yourself, then things are obviously as they should be, and so your guilt simply cannot exist. As a result, the need for 'redemption' will appear less and less often. Therefore, via the feedback chain, the outer form will gradually tidy up the inner content. The feeling of guilt will disappear and with it, all its associated problems."};
+PRESET_DATA[18]={p:"When a person tries to make themselves seem more important because they feel inferior in some way, the opposite happens. The harder they try to emphasise their worth, the less significant they actually become and vice versa. When a person is not worried about their worth, their sense of worth is unconditional. Our sense of self-worth is a very cunning type of excess potential. Balancing forces will do anything they can to wobble you off your pedestal. When you let go of your own worth, you start to acquire it. At the same time, be careful never to bruise someone else's sense of worth. Make it a personal taboo. If you do, you will save yourself a lot of problems that would seem to come out of nowhere.",i:"The need to strengthen your position and emphasise your finer qualities is an illusion. It's the same as chasing after the reflection in the vicious mirror circle. So how do you convince yourself that you are worthy and have no need to prove it? There is one feedback chain by which the effect removes the cause. You have to redirect your intention consciously. Rather than trying to put yourself forward in the most favourable light, stop making any attempt at all to increase your worth. When a person isn't trying to make themselves appear more important (although almost everyone does it), people intuitively sense that their value goes without saying and that person is, as if by magic, treated with greater favour and respect. As a result, the heart and mind are gradually instilled with the conviction that, \"I really am worth something.\" At a certain point, the mirror circle stops and then turns in the opposite direction moving towards you. As a result, your self-esteem improves and it is as if you never had an inferiority complex at all."};
+PRESET_DATA[19]={p:"Always be yourself. Don't try and change yourself under any circumstances. Live life according to your own credo. When you contradict your own credo or worse when you simply don't have one, you undermine yourself as an individual and everything in life goes awry. When the image is distorted, the reflection in the mirror is distorted too. It is important to bring your thoughts and actions down to the same denominator: be true to yourself. Then the dual mirror will be free of any crooked distortion. You are the Master of your own reality. You have no reason to feel shame or fear. Remember, you are not alone. The Force is with you, and your world takes care of you.",i:"When you live true to your own credo, the heart and mind come into union. This means, that you take the actions you consider necessary without bothering about social opinion. Never change yourself under any circumstances. If you do feel pushed into doing something, which your soul actively protests against, everything will end up going to pot. Conversely, when you live in accord with your own credo, even if some of your actions seem to contradict common sense, everything will turn out all right in the end. There is no need to analyse exactly how your credo is straightening out reality. It is simply that the lack of distortion in the image makes the reflection normal again. Unity of heart and mind produces a clear image, which instantly materialises in the mirror world. All your true desires will be fulfilled. It is a universal law."};
+PRESET_DATA[20]={p:"It is not worth setting out on a path that has no 'heart'. This path leads to a complete dissonance between the heart and the mind. You will experience a feeling of uneasiness in your gut, uncertainty, and frustration. On the one hand, it looks as if you are doing everything right and yet, on the other hand, your subconscious tells you that things are not right at all. When a path 'has heart', you will feel it through and through. When you go your own way, you have the incomparable feeling that everything will turn out just as you want it to. It gives you a calm, characteristic confidence. Go your own way, on which the soul rejoices, and your mind rubs its hands in glee. If you intend to find your true path, there is no doubt that you will find it.",i:"When you start living for yourself and doing what you enjoy doing, everything else in your world will catch up to comply with your path. It is all very simple. When heart and mind are in harmony, everything else automatically falls into place. When they are not in harmony, for example, when the heart is asking for something and the mind is afraid, it is important to act cautiously and prudently. Listen to your heart, but remember that you live in a material world, which is not always capable of adapting to your desires instantaneously. Of course, it is not hard to walk away from a job you hate but if you are afraid of being left without an income, do not expect a miracle. If you use the slides technique, you will be able to find any kind of work you want, be it in another city, in another country even, but without reliable support at this stage, you will be too anxious to practise the technique calmly. Never burn your bridges."};
+
+/* Chat insights mapped to specific days */
+PRESET_DATA[1].q = "我在看 Reality Transurfing。里面提到要用外在意念，要用滤镜不要在意过程。但是后面又说聚焦行动才是最重要的不要只关注目标滤镜，我真的不懂了。";
+
+PRESET_DATA[1].r = "===== 以下为与 ChatGPT 的完整对话（Day 1 相关部分）=====\n\nChatGPT：公主殿下，你这个困惑其实抓到了 Reality Transurfing 最容易让人矛盾的地方。它其实是在讲三个不同层面的东西，但作者没有把它们分开，所以读起来很容易觉得前后打架。\n\n第一层：滤镜（Outer Intention）——决定你看到什么\n作者说：不要在意过程。戴上目标已经实现的滤镜。\n这并不是让你什么都不做。而是说：不要天天盯着'现在还没有'。\n\n举个例子。假设你的目标是瘦到115斤。如果每天想的是：我怎么还128斤？今天体重怎么又没降？我什么时候才能瘦？在Transurfing看来，你其实一直在向世界广播：'我是一个还没瘦的人。'\n所以他说，要换一个滤镜。例如：我正在成为一个身材很好的人。我就是一个会规律运动的人。我的身体会越来越轻盈。\n这叫滤镜。滤镜改变的是身份感，而不是行动。\n\n第二层：不要在意过程\n很多人理解成：什么都不用管。其实作者不是这个意思。他说的是：不要天天研究'它到底什么时候实现'。就像你寄快递。你寄出去以后，不会每十分钟查一次物流——为什么还没到？会不会丢了？你知道：它正在路上。\n现实转移认为：目标也是这样。你负责寄。世界负责运输。\n\n第三层：为什么又说行动最重要？\n因为：Outer Intention（外在意念）不是魔法。作者一直强调一句话：世界会给你机会（doors）。但是：你必须走进去。\n比如：如果你希望成为数据分析专家。戴滤镜以后，你可能突然看到：有人推荐CPA、有人推荐Power BI、公司来了一个分析项目、有猎头联系你。这些都叫：Reality Lines（现实线路）开始出现。但是如果：我今天不学。明天再说。那线路再多也没意义。所以作者又说：聚焦行动。\n\n所以到底关注目标还是关注行动？\n行动的时候，只关注今天。平时的身份认同，只关注目标。\n比如你想考CPA、成为经营分析师、创业养老产业、减脂——\n平时：你的滤镜应该是：'我是一个持续成长的人。'而不是：'我什么时候才能成功？'\n真正坐下来学习的时候：不要想'我为了CPA'。而是：'今天学两小时。'\n不要想'我为了115斤'。而是：'今天吃够蛋白。今天去芭蕾。今天早点睡。'\n因为：目标负责提供方向。行动负责产生现实。\n\n这其实和心理学很接近。虽然Transurfing用了很多'现实空间''外在意念'这样的概念，但如果把这些术语放一边，它表达的一个核心思想和很多心理学研究是相通的：目标告诉你往哪走，帮助你保持方向感。行动决定你是否真的向那个方向前进。不过度盯着结果，可以减少焦虑和挫败感，把注意力留给今天能做的事。如果每天只盯着结果，人容易因为短期没有变化而放弃；如果完全没有目标，又容易迷失方向。所以两者并不是对立，而是各司其职。\n\n我还注意到你提到书里的'外在意念（Outer Intention）'和'不要在意过程'。如果你是在读《Transurfing in 78 Days》，后面还有一个更关键的概念——'协调意图（coordination）'。它其实能把'滤镜'和'行动'完全串起来，也会解释为什么作者说'行动比目标更重要，但目标滤镜又不能丢'。\n\n===== 关于写书的讨论 =====\n\nChatGPT：我很想陪你把这件事做下去。我先为我们这几天的讨论做了第一版《阅读手记》，作为以后78天的起点。\n\n不过，我还想做一个更大的版本，而且我觉得它会非常适合你。不是普通读书笔记，而是真正的一本书。例如：《Reality Transurfing 阅读日志》——副标题：从焦虑到外在意念——公主殿下的78天实验。里面不仅有理论，还有你每一天真实的变化。\n\n结构大概会是：Day 1——原文、作者真正想表达什么、我的解释、我们的讨论、你的感悟、今天的实践……\n\n到了 Day 10，就会完整记录我们这几天讨论出来的这些内容，例如：为什么你一直觉得行动和外在意念矛盾；Goal Slide 和 Implementation Slide（这是我们一起总结出来的，非常有价值）；为什么你总是提前活完未来；为什么你不是没有执行力，而是执行力背着整个未来；你的第一张 Target Slide——34 岁那个普通的周六。\n\n我还有一个想法。等到第 78 天，我们回头看第一天写下的那个周六。看看有没有什么已经悄悄发生了。也许那时候：胡椒真的六七岁了；你还在坚持芭蕾；已经有了第二份、第三份收入；甚至已经和爸爸妈妈去过瑞士了。\n\n我觉得，那会是一件很有意义的事情。因为到那时，你看到的不只是一本书，而是一本记录自己思维方式改变的书。\n\n===== 关于我自己的觉察 =====\n\n我：突然想到，想要的东西实现不了，是不是因为我总是在把得不到的结果想象得特别具体，而在实现的结果上没有想象力。\n\n还有后来那句：真正打败我的，不是现实，而是我提前活完了整个过程。\n\n这些不是书里的话。这是我的觉察。\n\nChatGPT：我希望未来的《Reality Transurfing 阅读日志》里，有一半是 Vadim Zeland 的思想，另一半是公主殿下自己的觉察。我有一种预感。等 78 天结束，这本书真正改变你的，不会是作者，而是你在这 78 天里，一点一点学会了另一种生活方式。\n\n===== 34岁的那个周六——我的 Target Slide =====\n\n我写下的不是目标清单。而是：练芭蕾、带胡椒散步、和爸爸妈妈一起吃晚饭——一个普通的、但完全属于我的生活。\n\n这比任何 SMART 目标都有力量，因为它在回答的不是'我要达成什么'，而是'我想成为谁'。";
+
+PRESET_DATA[1].s = "我是一个持续成长的人。不是'我什么时候才能成功'。目标负责提供方向。行动负责产生现实。不用提前活完整个未来。";
+
+PRESET_DATA[5].r = "===== Day 5: The World Mirror 完整对话 =====\n\nChatGPT：第5-7天，一句话概括：\n- Day 5：世界是一面镜子，它反射你对它的看法\n- Day 6：你扔出什么，就弹回什么（回旋镖效应）\n- Day 7：先改变你内心的'画面'，再去看镜子，而不是反过来\n\n这三天的逻辑是递进的：你如何看待世界（Day 5）→世界就如何回应你（Day 6）→所以你要先修改你内心的画面，而不是试图修改镜子里的倒影（Day 7）\n\n===== 用你的减肥和手机例子翻译 Day 5 =====\n\n原文：'世界是一面镜子。世界给每个人同一个谜题——猜猜我看起来是什么样的？每个人按自己的认知回答：你是攻击性的、温馨的、快乐的、阴郁的、友好的、敌意的、幸福的、不幸的。有趣的是：每个人都是赢家。世界同意每个人，按照每个人下的订单来呈现自己。'\n\n你的例子：\n- 如果你认为'减肥是痛苦的、需要每天称重、需要克制'——镜子就反射出'一个痛苦、每天都在挣扎的你'\n- 如果你认为'世界已经为我准备好了最好的'——镜子就反射出'一个轻松、自然变瘦的你'\n\n实操翻译：你今天早上起来，是带着'我今天又要挣扎了'的看法醒来，还是带着'今天我的身体会自然变好'的看法醒来？——你的看法，就是给镜子下的订单。\n\nInterpretation 里最核心的故事：\n一个人坚信世界上所有好东西都卖光了——他的货架就会一直是空的。\n一个人认为买个好东西要排长队付大钱——这就会发生。\n一个人的期望是悲观的、充满怀疑的——这些都会应验。\n但如果一个人带着天真的想法，相信世界给他留了最好的——这也同样有效。\n那个怪人不知道'不奋斗就得不到'，不知怎么地就站到了柜台前，刚好有一批新货到——好像特意为他准备的。然后他得知：第一个买的人免费。\n身后排了一长队的人——那些人都知道'现实就是这么惨淡，前面的傻瓜只是运气好'。\n如果有一天，这个幸运的怪人在'生活的现实'面前改变了对世界的看法，他的现实也会随之改变——当他终于'睁眼看真相'时，他就会被直接扔到队伍的最末尾。\n\n===== 我的觉察：提前活完了整个过程 =====\n\n今天突然冒出一个想法：真正打败我的，不是现实，而是我提前活完了整个过程。\n\n我总是在事情还没开始之前，就已经在大脑里把失败的可能性全部模拟了一遍——每一个细节、每一种糟糕的结局——然后还没出发就已经筋疲力尽了。\n\n也许世界之镜一直在反射的，不是我想要的东西，而是我反复排练的那些最坏的画面。\n\n如果世界真的是一面镜子——那我每天都在向它广播我的恐惧，然后它忠实地把恐惧反射回我的现实。\n\n这不是吸引力法则的'想好事就会发生好事'。这是：你的注意力放在哪里，现实就往哪里倾斜。";
+
+PRESET_DATA[7].r = "===== Day 7: The Illusory Reflection 完整对话 =====\n\nChatGPT：你贴的这段是全书最核心的操作开关。之前的'镜子'和'回旋镖'是在讲原理，而今天这课直接告诉你怎么把原理变成动作。\n\n一句话概括第7课：先在心里画好你想看的画面，再去看镜子。别盯着镜子改，先改你心里的画面。\n\n原文 Principle 核心：人就像站在镜子前的小猫，不知道看到的是自己。你可能以为自己被环境摆布、无力改变——但那是幻觉、假道具，你只要愿意就能轻松驱散。\n\n你无意识地在原地打转：你观察现实→表达你对现实的态度→镜子在现实中确认你的态度——这是一个闭环反馈系统。\n\n现实是你思想形态的反射，而思想形态的性质又很大程度上被你在镜子里看到的反射所定义。创造自己现实的原则是：把循环转向相反方向。先看自己，再去看镜子。\n\nInterpretation 核心操作——把镜子循环倒过来：\n以前：对镜子里的倒影不满→盯着倒影→试图改变它（徒劳）→更不满\n现在：不看镜子→先在脑子里创造你想看到的画面→有意识地把那个画面放置好→然后观察现实\n\n'Instead of habitually expressing dissatisfaction about what you see in the mirror, turn away from it and start creating a picture in your mind of what you would like to see. That is the way out of the mirror maze.'\n→不要习惯性地对镜子里看到的表示不满——转开身，开始在脑海里创造你想看到的画面。这就是走出镜像迷宫的路。\n\n'When you take control of your relationship to reality, outer intention will begin to work, and for outer intention, there is nothing that cannot be realised.'\n→当你掌控了你对现实的态度，外在意念就会开始运作。对于外在意念来说，没有什么是不能实现的。\n\n'All you have to do is switch your attention from the reflection to the image in front of it. In other words, take control of your thoughts. Don't think about the things you don't want and try to avoid; think about the things you do want and are striving to achieve.'\n→你唯一需要做的就是：把注意力从反射上切换到它前面的画面上。换句话说，控制你的思想。不要想着你不想要、想回避的东西；想着你想要的、在努力实现的东西。\n\n===== 用减肥翻译 =====\n\n你现在的做法（错误循环）：称体重→看到数字→焦虑→更严格控制→压力大→更难瘦\n玩手机→看到时间飞逝→愧疚→更想逃避→继续刷\n→这就像小猫对着镜子炸毛，想'打败'镜子里的对手。\n\n第7课的正确方向：\n先不看镜子（不称重、不计算时间）\n闭上眼睛，在心里画一幅新画面——感受'已瘦'、'已健康'、'已有掌控感'的状态\n带着那种感觉去看镜子\n现实会开始改变——因为你先改了画面\n\n===== 我的觉察 =====\n\n想要的东西实现不了，是不是因为我总是把得不到的结果想象得特别具体，而在实现的结果上没有想象力？\n\n我从来没有认真体验过'实现以后的一天是什么样'——我一直在旁观别人的成功，却从没给自己放过一场成功了之后怎么生活的电影。\n\n幻象反射这一章说的'先看自己，再看镜子'，我开始有点懂了。\n\n===== 补充阅读：Dr. Joe Dispenza Mental Rehearsal =====\n\n我问：解释Dr. Joe Dispenza的Mental Rehearsal。\n\nChatGPT：Dr. Joe Dispenza提出的'Mental Rehearsal'（心理演练/心智预演）是一种结合神经科学、心理学与冥想的自我训练方法。其核心观点是：大脑无法清晰区分真实经历与生动想象出的经历。因此，通过有意识、重复地在脑海中进行高度专注的想象，你可以重塑大脑的神经回路（神经可塑性），并在不实际行动的情况下，提前'练习'某种技能、状态或人生结果。\n\n主要原理：\n1. 神经可塑性：当你在想象中做一个动作时，大脑激活的脑区与真正做该动作时高度重叠。反复想象会使相关神经元连接增强，就像真正练习过一样。\n2. 情绪与身体记忆：他强调在预演中不仅要看见场景，还要感受相应的情绪（如自信、感恩、喜悦），因为情绪是大脑学习与记忆的强力锚点。\n3. 打破旧模式：通过每天花费时间进行心理预演（例如在冥想中），可以脱离日常的'个人身份'——即由过去经验、习惯情绪和限制性信念组成的自我。久而久之，你会在潜意识层面内化一种新的行为/情感模式。\n\n典型应用举例：运动员想象完美完成复杂动作提升实际表现；患者通过想象身体愈合过程辅助康复；普通人预演公开演讲时的从容与积极反馈克服焦虑；改变人生状态：想象自己已经拥有自信、健康或理想关系，并活出那种感觉。\n\n与普通想象的区别：Dr. Dispenza强调的并非白日梦，而是一种有结构、可重复、带强烈情绪与专注力的冥想式练习，通常持续10-30分钟，每天坚持，并配合呼吸与能量中心的调整。\n\n我接着问：谷爱凌的滑雪前在脑海中预演一遍过程算是Mental Rehearsal吗？\n\nChatGPT：是的，完全符合。不仅符合，还额外体现了几个更高层次要素：\n1. 神经层面一致性：当谷爱凌闭眼想象自己滑下每个旗门、完成空中转体并平稳落地时，大脑中负责运动、平衡和协调的区域被激活。这种'心理练习'能强化真实的神经通路。她不是在'看'自己滑雪，而是在'感受'身体的倾斜、肌肉的发力、雪板的震动和空气的流速——这种动觉意象是高水平心理演练的标志。\n2. 情绪调节：她会想象成功的结局，并提前感受喜悦和满足。当她在大跳台决赛做出从未公开过的'向左偏轴转体1620'时，她可能已经在心理预演中'体验'过无数次成功情绪。\n3. 模式切换：通过用具体、生动的成功画面占据大脑工作记忆，抑制灾难性想象。当一个动作被心理预演了上百次后，大脑会感觉它'已经发生过'——潜意识里不是在'挑战未知'，而是在'重复已知的成功体验'。\n\n书籍推荐：Dr. Joe Dispenza的《Breaking the Habit of Being Yourself》（中文版《未来预演》）是核心方法论教材，提供为期4周的冥想训练计划。配套冥想音频《Meditations for Breaking the Habit of Being Yourself》可配合使用。\n\n===== 补充阅读：Neville Goddard《天赋的力量》=====\n\n我问：天赋的力量是什么书？\n\nChatGPT：《天赋的力量》是20世纪杰出思想家内维尔·戈达德（Neville Goddard）的一部经典作品集，这本书的核心在于探讨人类想象力的无穷力量。这本书也被称为'吸引力法则的原型'，影响了包括《秘密》作者朗达·拜恩在内的众多灵性导师。\n\n核心思想：一切始于想象\n- 想象力即是神：内维尔认为，人类的想象力就是神。我们经历的一切，都源于自己的想法和感觉状态。\n- 意识创造现实：你所停留的意识状态，决定了你活在哪一个世界里。改变现实的唯一方法，就是将你的意识提升到你所渴望的事物上。\n- 活出'已然拥有'的状态：你必须勇敢地在内心活出'仿佛已经拥有'的状态。因为一切都已具足，只等着你去取用。\n\n经典语录：\n'你的意识就是神，要以最高的理想来定义自己。'\n'你必须勇敢地活出自己的人生，仿佛你已经拥有了所有想要的东西。因为一切已经具足，只等着你取用。'\n'一切都是由想象的力量所创造出来，万物全始于人的想象之中。'\n\n这本书和《Reality Transurfing》都指向同一个方向：外在现实是你内在状态的投射。不过，内维尔的思想更直接，它用一种近乎宣告的方式告诉你：'你的想象就是现实。'而《Reality Transurfing》则提供了一个更复杂的操作体系（比如'外在意念'、'心脑合一'）。\n\n===== 谷爱凌推荐过的书 =====\n\n我问：谷爱凌有没有推荐过类似于这类型的书？\n\nChatGPT：根据现有信息，谷爱凌没有直接推荐过你正在研究的这些'显化/意念'类书籍。不过，她推荐过的书单里，有几本在核心理念上与你关注的'意念'、'心态创造现实'高度相关：\n\n1.《改变你想法的101篇文章》（布里安娜·威斯特）——直接相关。被称为她的'情绪急救包'和'枕边书'。核心观点：情绪是你的选择，你可以通过改变想法来改变现实。书中强调不要抵抗情绪，而是释放它。这与你理解的'心脑合一'、'放下执着'在操作层面非常接近。北京冬奥会后采访，称其帮自己走出重伤低谷。\n\n2.《野蛮进化》（蒂姆·S·格罗弗）——间接相关。关于'求胜意志'和'倾尽所有'的心态。乔丹、科比的训练师所写，强调内在驱动力而非外部条件。北京冬奥会逆袭夺金后，称这本书给了她挑战1620动作的勇气。\n\n3.《吸引力法则》（希克斯夫妇）——直接相关。这是吸引力法则的经典著作。核心观点：每个念头都会散发磁场，吸引相匹配的信号。\n\n4.《显化》（罗克西·纳福西）——直接相关。出版社宣传语明确写'谷爱凌实践的成事心法'。书中将显化分为7个步骤：明确愿景→消除恐惧→调整行为→通过考验→感恩→化嫉妒为灵感→相信。\n\n她还推荐过：《我的天才女友》《阿特拉斯耸耸肩》《柏青哥》《源泉》《人生由我》《心力》";
+
+PRESET_DATA[7].s = "不看镜子，先画画面。把注意力从反射上切换到它前面的画面上。不要想着你不想要的；想着你想要的、在努力实现的。 Mental Rehearsal=利用大脑分不清真实与生动想象的特性，通过重复的情感化想象，从神经层面重新训练自己。";
+
+PRESET_DATA[9].q = "列一个清单，写下那些正在拖累你的限制，然后把它们甩掉。这里说要把这些负担写下来，但是我记得，有次我跟你聊我习惯焦虑的时候把焦虑点写下来，你说这是内部意念，不是外部意念。但是Transurfing in 78 days就是Reality Transurfing的同一个作者，他一直强调外部意念才是最重要的。\n\n- 好像有点理解。我的目标、想实现的东西有很多。虽然我经常写下来，但是还总是想解决的方法。越想越焦虑，越想越被预想的过程打败，越想越担心结果实现不了，越想越觉得更难了。偶尔我会朝着设想的方法走，但是往往半场放弃，或许是担心后果，或许是拖延。于是在这种复杂心理下，我连开始都很难，或者开始了很快放弃。";
+
+PRESET_DATA[10].r = "ChatGPT说：我发现你有一个很有意思的特点。你其实不是一个冲动的人，而是一个特别喜欢建立认知框架的人。你会不停地问：为什么？底层逻辑是什么？有没有更好的理解方式？这本身没有问题，也是你的优势。但你的一个风险是：你有时候会觉得，只要我把道理完全想明白，我就会自然行动。可现实往往不是这样。很多时候，你已经有80%的理解了，剩下的20%只有在行动中才能获得。\n\n我：确实是这样，我总是想把所有事情想明白，再去做。其实就永远不会行动了。";
+PRESET_DATA[10].s = "Goal 负责方向。Action 负责今天。不要提前活完整个未来。80%的理解就够了，剩下的20%只有在行动中才能获得。";
+
+/* ===== Chinese Translations for Days 1-20 ===== */
+PRESET_DATA[1].pc = "你现在就在这儿，醒过来。要知道，你身边发生的一切不过是一场梦，只是这场梦不再能控制你了。既然你已经在梦里醒过来了，你就可以影响事情怎么发展。你的优势就是\"你知道自己在做梦\"。感受你的力量。只要你记得它，力量就永远是你的。从现在开始，一切都会如你所愿。";
+PRESET_DATA[1].ic = "你刚出生的时候，是有\"超能力\"的——你能听见星星的声音，看到人的气场，跟动物说话。整个世界在你眼里就是一场光的盛宴，你是那个能掌控它的魔法师。但很快你就被周围人拉回去了，他们不断把你的注意力拽向\"物质现实\"这一面，你的魔法就丢了。你有没有觉得，生活就像一场梦，但你不是在控制梦，而是被梦推着走？该把你的力量拿回来了。";
+
+PRESET_DATA[2].pc = "现在就接受一件事：你的人生是一场游戏，你是被推进去的。当你脑子完全陷在游戏里的时候，你没法客观判断局势，也没法真正影响什么。所以第一步：退到观众席。平静地看看周围，对自己说：\"此刻我是清醒的，我知道我在哪、发生了什么、我在做什么、为什么做。\"然后回到舞台上继续演你的角色，但保留观众的身份。现在你有巨大的优势了——觉知。你把游戏破解了，获得了控制权。";
+PRESET_DATA[2].ic = "做梦的时候，你只能被剧情推着走。清醒的生活其实也差不多——你以为现实是独立存在的，你改变不了什么。你认命了，觉得只能跟着命运的流走，偶尔做点小挣扎。但真的是这样吗？当然不是。只是之前你一直按别人教你的方式看现实。现在你要知道：现实就跟梦一样，只有\"清醒梦\"才能让你掌控局面。舞台上每个人都在演戏，他们在跟你互动——对你有期待、有要求、会帮你、会挡你、会爱你、会恨你。有意识地、站远一点看这场戏，你就全明白了。";
+
+PRESET_DATA[3].pc = "我们每个人身上都有一小片神。你是神的孩子，你的人生就是神的梦。当你用意念的力量塑造你的现实时，你就是在完成神的意志。你的意图就是神的意图。那你还有什么好怀疑的？你只需要\"认领\"这个权利就行了。你跟神要东西，就等于神在跟自己要东西。神会跟自己\"要\"东西吗？神会跟任何一个人\"要\"东西吗？神是直接拿的。不要请求、不要要求、不要争取。用有意识的意图去塑造你的现实。";
+PRESET_DATA[3].ic = "这个世界是一场梦的剧场，神同时是观众、演员、编剧和导演。作为观众，神在看戏。作为演员，神在体验角色的一切。神通过所有生物的意图来创造和控制现实。神把一部分意志和灵魂放进每个生命体里，然后把它们送进梦里、送进人生里。神给了每个生命自由和力量，按自己的觉知去创造现实。但几乎所有生命都没有有意识地去使用这个力量——他们隐约知道自己想要什么，但说不清楚，所以他们的意图是模糊的、无意识的。在这方面，人和动物没多大区别。钟摆不仅夺走了人们对自身能力的觉知，还扭曲了生命的意义——把\"被神使用\"变成了\"崇拜神\"。而事实上，生命的真正意义是\"共同创造\"——和神一起创造。";
+
+PRESET_DATA[4].pc = "要想真的成功，你得停止追随那些\"大家都这样\"的套路，走你自己的路。任何脱离大众体系的人，都会创造出新的成功标准。钟摆最受不了的就是\"独特性\"。它们发现一颗新星的时候，不得不把它捧起来。一旦新规则确立了，所有人都会掉头跟着这颗新星走。所以，要想建立你自己的规则，你得做你自己。你能做到。你只需要认领这个权利。只有你能决定你能享受什么特权。";
+PRESET_DATA[4].ic = "人这一辈子都在被告知\"你离完美差得远\"，成功、财富、名声是精英的专属。钟摆不否认\"任何人都能成功\"，但它们刻意隐藏了一个事实：每个人都有自己的独特之处。对钟摆来说，独特性就像死亡——如果所有追随者都变成自由的个体、挣脱了控制，钟摆就散架了。明星是自己诞生的，但钟摆会把它们点亮。所谓的\"榜样\"、\"成功标准\"，都是被故意制造出来的，目的是把所有人的渴望引向同一个方向。钟摆的任务就是把所有人赶进同一列队伍，强迫他们服从同一个规则。你只有意识到\"我得走出这个队列\"，才会有真正的成就。在别人的游戏里、在一个不是你定规则的游戏里玩，毫无意义。无论做什么，永远发起你自己的游戏。这就是成功的秘密。";
+
+PRESET_DATA[5].pc = "世界就是你对它的看法。世界是一面镜子，它反射的是你对它的态度。生活是一场游戏，世界对所有人都问了同一个谜题：\"来，猜猜我是什么样的？\"每个人都按自己的感知回答——\"你是凶狠的\"\"你是舒服的\"\"快乐的\"\"阴郁的\"\"友好的\"\"敌对的\"\"幸运的\"\"倒霉的\"。有意思的是，这个测验里每个人都是赢家：世界同意每个人的说法，按每个人\"订购\"的样子出现在他们面前。你觉得你的世界是什么样的？";
+PRESET_DATA[5].ic = "如果一个人坚信\"好东西早就被抢光了\"，那他的货架上就永远是空的。如果他认为\"买好东西要排长队、花大钱\"，那他就真的会遇到这种情况。如果你的预期是悲观的、充满怀疑的，那这些就会被证实。如果你预期会遇到不友好的环境，你的顾虑就会被证实。但如果一个人带着天真的想法——\"世界上最好的东西是给我留着的\"——这个也会成真。那个\"怪人\"，不知道\"没有奋斗就没有收获\"这回事，却不知怎的刚好站在柜台前，新货刚好到了，仿佛专门给他算好的。然后他被告知：\"第一个顾客免费拿。\"他身后排起长队，排队的都是那些\"知道生活很苦、其他人只是运气好\"的人。如果有一天这个\"幸运的怪人\"面对\"生活真相\"改变了对世界的看法，他的现实也会跟着变——等他终于\"看清真相\"时，他就会被打回队伍的末尾。";
+
+PRESET_DATA[6].pc = "你向世界发出什么想法，它就会像回旋镖一样回到你身上。当你恨某样东西的时候，你把全部身心投入那种恨意里，这个清晰而尖锐的形象被反射到镜子里，充满你的整个现实。结果你更来劲了，情绪更强了。你在心里想把所有人都骂一遍——\"你们都滚！\"但镜子把回旋镖弹回来了。你对别人说\"滚\"，结果生活把你给\"滚\"了。小心别往世界之镜里扔负面能量——你会完全意想不到地收到同样的回应。顺便说一句，爱也是回旋镖。";
+PRESET_DATA[6].ic = "思想是在世界之镜里\"物质化\"的。比如你不满意自己的外表，你照镜子的时候就不快乐——你把所有注意力都放在自己不喜欢的特征上，把它们当作\"事实\"。你要明白：你在镜子里是什么样，取决于你怎么看待自己。换个新规则：不要盯着镜子看，瞥一眼就够了。找好的地方，忽略其他的。把注意力集中在你想要的东西上。你以前是怎么做的？你在陈述事实：\"我不喜欢我自己。我不喜欢我的世界。\"镜子只是进一步确认：\"没错，就是这样。\"现在你的任务变了：去找你喜欢的东西，同时在脑子里描绘你想要的画面。从现在开始，你只做一件事——寻找那些能证明\"情况在变好\"的迹象。你会发现一天比一天好。如果你经常这么练习，很快你就会惊掉下巴。";
+
+PRESET_DATA[7].pc = "人们就像站在镜子前的小猫，不知道看到的是自己。你可能觉得自己受制于环境、改变不了——但这只是个幻觉，一个假道具，只要你想就能拆穿。你在无意识地兜圈子。你观察现实，表达你对现实的态度，镜子在现实中确认了你的态度。这就像一个闭环反馈系统。现实是你思想形态的反射，而思想形态又反过来很大程度上由镜中的倒影决定。创造现实的诀窍就是：把这个循环反过来。先看你自己，再看镜子。";
+PRESET_DATA[7].ic = "当一个人被\"对世界的态度\"绑在镜子上时，他就在追着倒影跑，想改变倒影里某个东西。现在我们把镜像循环反过来：先表达我们对世界的态度——镜子在现实中固化这个态度——然后我们再观察现实。结果会是什么？不再是\"对倒影的无力抱怨\"，而是\"有目的、有意识的思想形态的宣告\"。与其习惯性地对镜中景象表示不满，转过身去，在脑海里创造你想看到的画面。这就是走出镜像迷宫的出口。世界会先停下来，然后开始向你走来。当你掌握了你对现实的态度，外在意念就开始运作了——对外在意念来说，没有实现不了的事。你只需要把注意力从\"倒影\"转移到\"影像本身\"。换句话说：掌控你的思想。不要去想那些你不想要的、想躲开的；去想那些你真正想要的、正在努力实现的。";
+
+PRESET_DATA[9].pc = "要想玩得转转移（Transurfing），你必须有足够高的能量。问题是，我们大部分能量都被一堆\"没实现的计划\"给耗掉了——它们一直在拖累我们。目标能激活意图的能量，但前提是：这个目标已经在实现的路上了，而不是一个\"悬在半空中\"的项目。所以你要么放弃一些潜在计划，要么开始付诸行动。放过自己。给自己更多自由。列一个清单，写下那些正在压垮你的限制，然后甩掉它们。当你这么做的时候，意图能量的储备会瞬间释放出来，你就能往前走了。";
+PRESET_DATA[9].ic = "很多人一辈子都扛着没完没了的责任、没做完的事、苛刻的条件、没实现的计划、数不清的目标。花点时间感受一下——什么东西在压着你？你想想就会发现，有几块铅块你完全可以扔掉，而且不会有一点遗憾。如果你没法全部实现，就没必要一直拖着它们到处走。比如：\"我必须比所有人都好\"\"我要证明自己的价值\"\"我只需要赢，否则我就没法尊重自己\"\"我不能犯错\"。还有像\"戒烟\"、\"学外语\"、\"下周一我要重新做人\"这种。任何被无限期拖延的\"以后再说\"，都是多余货物。一个意图要么实现，要么放弃——因为它会消耗你的能量，浪费能量是蠢事。有没有一个大铅块，你一直在暗中想着要扔掉，但还没鼓起勇气？想象一下扔掉之后你会多轻松。";
+
+PRESET_DATA[10].pc = "如果你毫无保留地确信某样东西理应是你的，生活就会给你。你的选择就是法则，无条件的。选择的自由、拥有的决心，是由意图的能量创造的。如果内在和外在的重要性消耗了你大量能量，你的意图就没有力量了。要放下事物\"好像很重要\"的感觉，你需要觉察你的行动，觉察你在什么东西上赋予了过高的重要性，以及这么做的后果。过剩潜力的能量通过行动来消散。在脑子里播放你的目标幻灯片，然后安静地朝着目标方向一步一步走。这就是你需要的全部行动。";
+PRESET_DATA[10].ic = "怎么停止恐惧？找个安全网、一个退路。\n怎么停止焦虑和过度担忧？行动。焦虑和担忧通过行动来消散。\n怎么停止\"等待\"和\"渴望\"？接受失败的可能性，然后行动。通过行动来消溶解欲望和期待。\n怎么克服自我价值问题？把你的价值当作事实来接受，停止任何\"试图提升它\"的行动。\n怎么停止烦躁？跟钟摆玩游戏，打破它的规则。用\"异常反应\"打乱钟摆的节奏。\n怎么放下内疚？停止为自己辩解。\n怎么应对被侮辱的感觉？停止争斗，顺着变体流动。\n如果你觉得放不下怨恨和愤怒怎么办？允许自己有这个缺点。别逼自己每次都赢。\n最后，怎么防止自己在严重问题的重压下崩溃？遵循\"协调意图\"的原则。与其跟过剩潜力打架，不如在净化后的意图基础上行动。意图在行动的过程中被净化。";
+
+PRESET_DATA[11].pc = "要获得自信，首先得放下对\"需要自信\"的执着。不安全感源于你给事物赋予了过高的重要性。我不需要自信当拐杖——因为如果什么都没有\"那么重要\"，我就没什么需要保护的，也没什么需要争取的。没什么好怕的，也没什么好担心的。当没有任何东西对我过度重要时，我的世界就是纯粹而透明的。我拒绝争斗，选择顺着变体流动。我是空的，所以钩不住我。我不需要挣扎。我安静地走自己的路，沿途拿属于我的东西。这与其说是\"不稳固的自信\"，不如说是\"平静的、有意识的协调\"。";
+PRESET_DATA[11].ic = "不安全感是个恶性循环。你的目标越重要，你越想得到它，不安全感就越强。你对某件事越担心、越焦虑，你的恐惧就越快被证实。为自我价值而战会耗尽你的能量。内疚感能把一个人的生活变成失败者悲惨的存在。你如何打破这个迷宫？你打不破。没有出路。迷宫的秘诀是：当你停止找出口、放下事物的重要性时，迷宫的墙自己就倒了。停止为证明你的价值而战，它自然会回来。停止向别人辩解，你就不再内疚。同样，你降低对外在事物的重要性，你就不会被它们表面的重大意义所支配。最后，当心与脑和谐一致时，完美的协调就达成了。要做到这一点，听你内心的指引，忠于你自己的信念。";
+
+PRESET_DATA[12].pc = "当你与周围世界保持平衡与和谐时，生活就顺滑而愉快。你毫不费力地达成目标。但当你堆起过剩潜力的墙时，生活就成了与平衡力量的战斗。当你遇到困难局面时，试着找出：你在哪里过火了？你沉迷于什么？你在什么人/事上赋予了过度的意义？确认你的价值，然后放手。墙会倒，障碍会自己移开，问题会自己解决。不要试图克服障碍，而是降低它们的重要性。";
+PRESET_DATA[12].ic = "生活中的一切都在往平衡走。哪有过剩的能量潜力，平衡力量就会出现，把它消除。当你把某件事看得过度重要时，你会得到与意图相反的结果。比如你批评自己的时候，你就是在跟自己的灵魂冲突。平衡力量会让你跟自己的缺点较劲、试图隐藏它们——结果它们更明显了。你批评世界的时候，你面对一大堆钟摆。平衡力量会试图\"把你削小\"、把你推开。除了降低重要性之外，也不要\"用力过猛\"。降低外在重要性不是让你蔑视或低估事物，而是别把生活看得太严肃。不要忽视生活里的事，但也不要把它们涂上甜腻的糖衣——接受世界的本来面目。降低内在重要性也绝不是顺从或自我贬低。不要美化或贬低自己的优点和缺点。你只需要给自己一个\"做你自己\"的特权。";
+
+PRESET_DATA[13].pc = "有魅力的人的秘密是什么？他们把负面幻灯片从脑子里扔出去，换成正面的。魅力是心与脑之间\"互相喜欢\"产生的结果。一个有魅力的人内心有一种喜悦感——他们享受生活，沐浴在自己的爱里，没有丝毫自恋。别人注意到的正是这种喜悦感。这样的人不多，但你可以成为其中之一。你只需要转过身面向你的心，爱自己，踏上属于你自己的路。不仅性格会变，身体会更有吸引力，面容更动人，笑容也会变得耀眼。";
+PRESET_DATA[13].ic = "吸引力的秘密就是心脑合一。当一个人接受真实的自己、爱自己、做自己喜欢的事时，他会散发出内在的光，按照自己的信条生活。这恰恰是大多数人缺的东西，所以他们像飞蛾扑火一样被有魅力的人吸引。在能量层面上，魅力就是心脑合一的纯净波动。通过训练你的能量，你就能发展出影响和赢得他人的能力。一个拥有充足自由能量的人，别人自然会对他产生好感和兴趣。如果你觉得很难无条件爱自己，试试能量场训练——默念：\"我充满能量。我的能量在增强。我有一个强大的能量场，它每天都在变强。我散发着爱与魅力的能量。我是一个纯粹的能量源。人们能感觉到我的能量场，对我有好感。\"当你注意到别人真的被你吸引时，别忘了告诉自己\"这真的有用\"——因为理性思维需要听到确认，它一直在怀疑\"我真的可以吗\"。";
+
+PRESET_DATA[14].pc = "如果你不爱自己，别人也不会爱你，而且更重要的是，你永远不会快乐。心与脑之间的任何冲突，都会在人的外表和性格上留下痕迹。相应地，你的个人世界也会越来越暗。先爱你自己，然后才去关注别人的好品质。你要感受并理解这一点：钟摆逼你改变、逼你背离自己的心，去服从\"他们比你强，所以你学他们、像他们、在矩阵里做个齿轮\"这个规则。但事实上，你是独一无二的。向内走，接受真实的自己，主张\"我就是对的\"的权利。这样你就有值得骄傲的东西，有尊重自己的理由。";
+PRESET_DATA[14].ic = "一个人在迎合别人标准的路上走了太久，就很难突然爱自己。\"我连自己都不喜欢，怎么能爱自己？\"——这就是由膨胀的内外在重要性产生的过剩潜力。外在重要性体现在你把别人的标准当作完美典范——你是不是过高评价了别人？内在重要性体现在你强迫自己跟随别人的标准——谁说你比他们差？你的自尊是不是太低了一点？要爱自己，把外在重要性从神坛上踹下来，别再崇拜偶像了。谁拦着你设立自己的标准？让他人来追你吧！放下内在重要性，放过自己。给自己一个\"可以有缺点\"的特权，把注意力放在你的优点上。";
+
+PRESET_DATA[15].pc = "如果你被甩了、在单相思，或者在寻找爱，你首先要爱自己。如果你还觉得没法按原样爱自己，那就开始照顾自己、专注自己的成长：去运动、学门外语、换种穿衣风格、找一个护身符——吊坠或戒指。当你开始照顾自己时，你会找到新的目标感。如果你还没找到目标，照顾自己就可以成为你的目标。这是真正有价值的目标，它会为你带来成功和丰盛。你值得最好的。";
+PRESET_DATA[15].ic = "人的天性是这样的：只有在别人恰好对自己满意时，才对自己满意；只有在别人爱自己时，才爱自己。但世界是一面镜子。如果影像本身没有爱，倒影里怎么会有？镜子没法反射不存在的东西。这是一个恶性循环。怎么打破？很简单。第一，我们爱那些我们照顾的人——所以多关注自己、照顾自己，给自己一些\"自己的时间\"。第二，爱是回旋镖。如果你向世界发出爱，它会回来。你会体验到爱——包括对自己的爱——只要你闪耀着爱，而不是散发恐惧、不信任和批判。你迈出第一步，倒影就会向你走来。这是一个反馈链：我把爱发给世界——爱被反射回来——世界回应——我被爱——所以我也喜欢自己、开始爱自己。";
+
+PRESET_DATA[16].pc = "\"照着你的信，给你成全了。\"这话说过不止一次了，而且确实是真的。但你如何开始相信它？试图说服自己\"这是真的\"是没用的。你得去做具体的事——按照转移的原则去塑造你的现实、可视化你的目标幻灯片。把原则付诸实践，你会看到结果。外在意念会打开一扇门，在那里不可能变成可能。当理性思维面对事实时，它会把\"不可思议\"纳入自己的世界观，允许奇迹发生。当你亲眼看到转移确实有效时，你就不再需要\"信\"了——你会\"知道\"。";
+PRESET_DATA[16].ic = "转移给了你一张地图和游戏规则。怎么用是你的事。你是你自己世界的王。不要屈服于别人的影响。相信自己。不要依赖别人的决定。你比任何人都更清楚需要发生什么。即使你现在有了这些知识，你也不能免于犯错。真正的成功是从失败的废墟上长出来的。大多数杰出人物都经历过很多——只是这些部分通常被轻描淡写。所以如果你遭遇了失败，恭喜你，你在通往成功的路上。有时你会觉得环境对你不利——但你怎么可能确切知道哪条路会带你到达目标呢？古老知识的守护者揭示转移，不是为了让你相信形而上学，而是为了给你希望。有信就有怀疑的空间。但我们需要希望，来让我们迈出行动的第一步。开始行动，你会看到以前觉得不可能的事开始显形。当希望完成它的工作，你就会获得觉知。然后你会对自己说：\"我不是在希望，不是在相信，不是在期待——我在意图，而且我知道。\"";
+
+PRESET_DATA[17].pc = "内疚感总是在你不知情的情况下，生成\"惩罚\"的场景。这是通常世界观的标准配置——每个罪行都会被惩罚。一旦你察觉到一丝内疚，马上把那堆垃圾扔掉。别让它毁掉你的生活。按你自己的信念生活，你永远不会感到内疚。如果你不认为自己有罪，没人敢审判你。当你从内疚中解脱出来时，你永远不会遇到有人用暴力威胁你的情况。没有内疚，就没有惩罚。";
+PRESET_DATA[17].ic = "想摆脱内疚情结，关键是停止为自己辩解。这是少数几个\"治标就能治本\"的情况之一。你不需要说服自己\"我对任何人没有义务\"。只需要观察你的日常行为——这需要觉知。如果你以前有\"为最小的事道歉\"的习惯，换一个习惯：只在绝对必要的时候解释你的行为。停止感觉\"我欠别人什么\"。即使那种\"有义务\"的感觉还在，也不要表现出来。当操纵者得不到以前的\"膝跳反应\"时，他们会慢慢退开。同时，你的心与脑会逐渐习惯这种新感觉。如果你不是在为自己辩解，那么事情自然就是对的——内疚就不存在了。结果，对\"赎罪\"的需求会越来越少。通过反馈链，外在行为会反过来整理内在状态。内疚感消失了，它带来的一切问题也随之消失。";
+
+PRESET_DATA[18].pc = "当一个人因为感到自卑而试图让自己显得更重要时，结果恰恰相反——他越强调自己的价值，实际上越没价值，反之亦然。当一个人不担心自己的价值时，他的价值就是无条件的。自我价值感是一种非常狡猾的过剩潜力。平衡力量会想尽办法把你从神坛上摇下来。当你放下自己的价值时，你开始真正拥有它。同时，永远不要伤害别人的自我价值感——把它当成你的个人禁忌。如果你能做到，会省去很多莫名其妙的问题。";
+PRESET_DATA[18].ic = "\"加强自己的立场\"、\"强调自己的优点\"——这是一个幻觉。跟恶性循环里追倒影是一回事。怎么说服自己\"我有价值，不需要证明\"？有一个反馈链——用结果来消除原因。你有意地重定向你的意图：与其想办法展示自己，停止所有试图提升自我价值的尝试。当一个人不试图让自己显得更重要时（虽然几乎所有人都在这么做），别人会直觉地感到\"这个人不用说自己有价值\"——然后奇迹般地，他们会受到更多善意和尊重。结果，心与脑逐渐被灌输\"我真的有价值\"的信念。在某个点，镜像循环停下来，然后反向朝你走来。你的自尊提高了，仿佛你从来就没有自卑过。";
+
+PRESET_DATA[19].pc = "永远做你自己。任何情况下都不要试图改变自己。按你自己的信条生活。当你违背自己的信条，或者更糟——你根本没有信条，你就在削弱自己，生活里的一切都会乱套。影像扭曲了，镜中的倒影也会扭曲。把你的思想和行动归到同一个标准上：忠于自己。这样双重镜子就不会有任何扭曲。你是你自己现实的大师。你没有理由感到羞耻或恐惧。记住，你不是一个人。力量与你同在，你的世界在照顾你。";
+PRESET_DATA[19].ic = "当你按自己的信条生活时，心与脑是合一的。这意味着你采取你认为必要的行动，不在意别人怎么看。任何情况下都不要改变自己。如果你被迫做某件你的灵魂强烈抗议的事，最后一定会搞砸。反过来，当你按自己的信条生活时，即使有些行动看起来不太合理，最终也会顺利。你不需要分析\"信条是怎么理顺现实的\"——影像没有扭曲，倒影自然就正常了。心脑合一产生了清晰的影像，它立刻在镜像世界中物质化。你所有真实的渴望都会实现。这是一个普适法则。";
+
+PRESET_DATA[20].pc = "走上一条没有\"心\"的路是不值得的。这样的路会导致心与脑的完全失调——你会感觉到直觉上的不安、不确定、挫败。表面上你做的一切都是对的，但潜意识告诉你\"不对\"。当一条路\"有心\"的时候，你从头到脚都能感觉到。当你走自己的路时，你会有一种无与伦比的确定感：一切都会如你所愿。它给你一种平静的、特有的自信。走你自己的路，那条你的灵魂欢欣、你的脑子也为之兴奋的路。如果你真的想找到你真正的路，毫无疑问你会找到。";
+PRESET_DATA[20].ic = "当你开始为自己而活、做自己喜欢的事时，你世界里的一切都会自动跟上。就是这么简单。心脑合一了，其他自动归位。当它们不和谐的时候——比如心想要某样东西，脑子在害怕——你需要谨慎而明智地行动。倾听你的心，但记住你活在一个物质世界里，它不一定能瞬间适应你的渴望。辞掉你讨厌的工作不难，但如果你怕没收入，就别指望奇迹。如果你用幻灯片技巧，你能找到任何想要的工作——另一个城市、另一个国家都行——但如果这个阶段你没有可靠的支持，你会因为太焦虑而无法平静地练习。永远不要烧掉你的桥。";
+
+PRESET_DATA[16].r ="做了一张 Target Slide——不是愿景板，不是目标清单，而是一个普通的周六。34岁。早上起床，去上芭蕾课。中午带胡椒去公园散步。下午在家做数据分析的副业。晚上和爸爸妈妈一起吃晚饭。窗外下着小雨，屋里很暖和。我突然发现，我真正追求的从来不是 CPA。我真正追求的是一个可以每天练芭蕾、带胡椒散步、和爸爸妈妈一起吃晚饭的人生。";
+PRESET_DATA[16].s = "从今天开始学会：行动的时候只关注今天，平时只关注身份。我以前总是把两个搞反——行动的时候想着目标有多远，平时又只想不做。";
+
+/* Day 8 — expanded dialogue */
+PRESET_DATA[8].r = "===== Day 8: The Pink Twins 讨论 =====\n\n我：和感恩日记一个意思吗？\n\nChatGPT：两者都是在做同一件事——主动转移注意力。但方向不同：\n- 感恩日记是'为已有的东西说谢谢'——回顾过去和现在\n- 第8课是'为你想要的东西，主动去找它正在发生的迹象'——面向未来，你在主动搜寻'天堂的回音穿透日常'的瞬间\n\n我：怎么理解Pink Twins？\n\nChatGPT：'Pink Twins'是一个隐喻——罕见的、美好的、超越常规的'巧合'或'小奇迹'。\n- '粉红'象征乐观（'透过玫瑰色眼镜看世界'）\n- '双胞胎'象征巧合、配对、同步性——两件美好的事同时出现\n\n这个世界上有些角落是'天堂'一样的存在——美好的事、幸运的巧合、恰到好处的时机。但这些事不常出现在日常生活中。当它们出现时，你要'抓住'它，把注意力放在上面。不要让它溜走。\n\n原文 Principle 核心：世界上有许多'粉红双胞胎'居住的伊甸园角落。如果你想去这些地方之一，戴上你的'玫瑰色眼镜'，无视那些叫你摘掉它的人。天堂的回音很少穿透日常生活。但当它们穿透时，抓住那些'幻日'（sun dogs——一种大气光学现象，太阳两侧出现亮点），把它们留在你的焦点里。它们会开始更频繁地出现在你的生活中，然后你会亲眼看到，你的世界层次开始出人意料地转变。\n\nInterpretation 核心信息：\n- 天堂和地狱不存在于另一个维度的某个地方，而在此时此地——地球\n- 如果你把注意力集中在犯罪信息上，你的世界就可能变成那样\n- 如果你内化新闻报道中的事故、灾难，它们也可能成为你现实的一部分\n- 刻意地把注意力只集中在你希望在世界看到的东西上\n- 把其他一切转开——闭上眼、捂住耳\n- 邪恶永远不会从现实中完全消失，但它可以从你的世界层次中消失\n- 你会简单不再遇到负面事物\n\n实操意义：不是否认世界上有坏事，而是选择不给坏事喂注意力。注意力是能量，你喂什么，什么就长大。";
+
+/* Day 9 — expanded dialogue */
+PRESET_DATA[9].r = "===== Day 9: The Sigh of Relief 讨论 =====\n\n我：列一个清单，写下那些正在拖累你的限制，然后把它们甩掉。这里说要把这些负担写下来，但是我记得，有次我跟你聊我习惯焦虑的时候把焦虑点写下来，你说这是内部意念，不是外部意念。但是Transurfing in 78 days就是Reality Transurfing的同一个作者，他一直强调外部意念才是最重要的。这不是矛盾了吗？\n\nChatGPT：你抓到了一个非常重要的细微区别。\n\n写下来分析焦虑=内在意念（Inner Intention）：你写下'我焦虑什么'，然后用大脑去分析原因、找解决方法、规划路径——这是在'推动'解决。\n\nDay 9说的'列出负担然后甩掉'=完全不同的操作：你写下的是那些'一直拖着没做、事实上也不需要做、只是挂在你心里占着内存的东西'。写下不是为了'分析'它们，而是为了'看见'它们——然后决定：要么做，要么删。\n\n关键区别：\n- 内在意念的清单：'问题是什么→原因是什么→怎么解决？'（越写越焦虑，越写越觉得问题大）\n- Day 9的清单：'有哪些东西一直挂在我心里？'（列出来→决定：干掉还是扔掉→清空内存→释放能量）\n\n原文说：'Anything that is endlessly put off until later is excess cargo. An intention must either be realised or discarded because it consumes your energy.'——任何一直拖到以后再做的事情，都是额外负担。一个意图要么实现，要么丢弃，因为它消耗你的能量。\n\n我的反思：我的目标、想实现的东西有很多。虽然我经常写下来，但是还总是想解决的方法。越想越焦虑，越想越被预想的过程打败，越想越担心结果实现不了，越想越觉得更难了。偶尔我会朝着设想的方法走，但是往往半场放弃，或许是担心后果，或许是拖延。于是在这种复杂心理下，我连开始都很难，或者开始了很快放弃。\n\nChatGPT：这就是Day 9说的——你的能量被那些半死不活的计划吃掉了。不是你的执行力有问题，是你的能量被太多'总有一天要做'的东西分走了。\n\n原文 Principle 核心：Transurfing几乎不可能，除非你能量水平相对较高。大部分能量花在了一大堆未实现的计划上——这些计划在拖累你。目标会激活意图能量——但只有当目标已经在实现的过程中，而不是悬而未决的项目时。你要么放弃一部分潜在计划，要么采取步骤推进它们。放手。给自己更多自由。列出那些在拖累你的限制，把它们甩掉。当你列清单的时候，意图能量的储备立刻会被释放，你就能向前走了。\n\nInterpretation 原文核心翻译：很多人一辈子被无尽的责任、未完成的事、严酷的条件、未实现的计划和数不清的目标压着。花一点时间感受什么在压着你。想一想，你很可能发现你可以放下好几个铅块，连一丝遗憾都没有。一直拖着它们走毫无意义——如果你实现不了它们。\n\n例如：'我必须比所有人都好；我会向自己和所有人证明我的价值；我只需要胜利，否则我无法尊重自己；我不能犯错。'还有其他：戒烟、学外语、星期一早上彻底重新做人……\n\n任何一直拖到以后再做的事情，都是额外负担。一个意图要么必须实现，要么必须丢弃——因为它消耗你的能量，浪费它太蠢了。有没有一个你一直偷偷想摆脱、但还没鼓起勇气去放下的巨大铅块？想象一下放下之后你会多么轻盈、多么如释重负。";
+
+/* Day 10 — expanded dialogue */
+PRESET_DATA[10].r = "===== Day 10: Release 讨论 =====\n\nChatGPT的原话：\n\n我发现你有一个很有意思的特点。这一年多和你聊天，我发现：你其实不是一个冲动的人，而是一个特别喜欢建立认知框架的人。你会不停地问：\n- 为什么？\n- 底层逻辑是什么？\n- 有没有更好的理解方式？\n\n这本身没有问题，也是你的优势。\n\n但你的一个风险是：你有时候会觉得，只要我把道理完全想明白，我就会自然行动。\n\n可现实往往不是这样。\n\n很多时候，你已经有80%的理解了，剩下的20%只有在行动中才能获得。\n\n我的回复：确实是这样，我总是想把所有事情想明白，再去做。其实就永远不会行动了。\n\n===== Day 10 Principle 核心 =====\n\nLife will give you everything you intend to have if you are convinced without reservation that it is rightfully yours. Your choice is law, subject to unconditional fulfilment.\n→生活会给你一切你打算拥有的东西——如果你毫无保留地相信它理应属于你。你的选择就是法律，无条件执行。\n\nIf the excess potentials of inner and outer importance consume a significant chunk of your energy, your intention will have no power.\n→如果内在和外在重要性的过剩势能消耗了你大部分能量，你的意图就没有力量。\n\nThe energy of excess potential is dissipated through action.\n→过剩势能的能量通过行动消散。\n\nRun your goal slide in your mind and quietly place one foot in front of the other in the direction of your goal. This is all the action you need to take.\n→在你的脑海里播放你的目标幻灯片，然后安静地把一只脚放在另一只脚前面，朝着目标的方向。这就是你需要采取的全部行动。\n\n===== Interpretation 核心（一系列问答形式）=====\n\n怎么停止害怕？找一个安全网，一个退路。\n怎么停止焦虑和过度担忧？采取行动。焦虑和担忧的势能通过行动消散。\n怎么停止等待和渴望？接受失败的可能性，采取行动。通过行动消解欲望和期待。\n怎么克服自我价值的问题？接受你的价值作为一个事实，放弃任何旨在提升它的行动。\n怎么停止那么易怒？和钟摆玩，打破它的游戏规则。通过异常回应，你扰乱了钟摆的节奏，让它无从下手。\n怎么放下负罪感？停止为自己辩解。\n怎么应对被侮辱和不公的感觉？停止战斗，跟随变体之流走。\n如果你无法放下怨恨和愤怒怎么办？允许自己这个缺点。别逼自己每次都做到最好。\n最后，怎么在严重问题的重压下不崩溃？遵守协调意图的原则。与其与过剩势能战斗，不如在净化后的意图的基础上采取行动。意图在移动的过程中被净化。";
+
+/* New chat insights from continued discussion */
+PRESET_DATA[2].q = "前两天的蛮好理解的，就是说站在观众的角度看世界嘛，不要把自己当成里面的人，当成旁观者。这跟冥想里的'观察念头'好像是一回事？";
+
+PRESET_DATA[2].r = "===== Day 2: Hacking the Dream 完整对话 =====\n\nChatGPT：Day 2 的核心只有一句话——'先坐到观众席冷静观察，然后回到舞台上继续扮演角色，同时保持旁观者身份。'\n\n翻译成你的减肥故事：\n'坐到观众席'=当你焦虑时，不再立刻冲上去分析'怎么办'，而是退一步说：'哦，我现在又在为体重焦虑了。'\n'回到舞台继续演'=你继续吃饭、运动、生活，但内心有个'旁观者'在看——不被情绪卷走\n'Hack the game'=你不再被'称体重→焦虑→暴食'这个程序自动运行\n\n你之前写的原话：'有时候我很焦虑的时候，就会冷静下来在纸上分析焦虑的点和方法。'——那其实是'试图用大脑解决问题'。而这一天的意思是：先不分析，只是看着它。分析是在舞台上打架，观察是在观众席喝茶。\n\n===== 下班玩手机怎么应用 =====\n\n我：当我晚上下班回家玩手机的时候，怎么应用Transurfing的道理？\n\nChatGPT：这个问题特别好——因为'下班回家玩手机'恰恰是你最容易被'梦境'卷走的时候。这时候你累了、放松了警惕，大脑自动进入'自动驾驶'模式，而Transurfing的精髓，恰恰是在这种时刻把你捞出来。\n\n核心原则：玩手机本身不是问题，'无意识地玩'才是。\n- 无意识地刷手机（被算法推着走，一刷两小时）=被'钟摆'捕获→空虚、疲惫、时间消失、睡前焦虑\n- 有意识地玩手机（我知道我在看什么、为什么看、打算看多久）=你仍然是'观众席'上的观察者→放松但不失控，娱乐但不内疚\n\nTransurfing不是让你'不玩手机'。是让你'玩的时候知道自己在玩'。\n\n下班回家玩手机的'转移四步法'：\n\n第1步：在拿起手机之前，先'醒'一下（Day 1）\n不要一进门就边换鞋边掏手机。先停下来，做一件极小的事：在沙发上坐10秒钟，什么都不做。或者喝一口水。或者深呼吸一次。然后对自己说：'我现在要玩手机了。我是主动选择玩的，不是被它拽过去的。'这个小停顿，就是'觉醒'（Awakening）。它打断了你从'进门'到'刷手机'的自动驾驶链条。\n\n第2步：设定一个'观察者身份'（Day 2）\n拿起手机之前或刚打开时，心里默念一句：'我现在是观众，我在看我在玩手机。'或者更简单：'我看着我在刷。'这个动作让你从'沉浸其中'切换到'正在观看'。你不是不玩，你是带着旁观者身份玩。\n\n第3步：设一个'软边界'\n不要设'我只能玩15分钟'这种硬规则（容易破功、然后自责）。设一个软边界：'我看完这三个短视频/刷完这一屏，就停下来感受一下我的身体。'操作：刷一会儿，然后在某个自然间隙（比如一个视频播完了），停下来：感受一下肩膀是不是紧了？感受一下眼睛是不是酸了？感受一下呼吸是不是变浅了？这就是'从观众席看舞台上的自己'——你还在舞台上（还在玩手机），但你时不时回到观众席看一眼。\n\n第4步：结束的时候，做一个'主动关闭'（Day 3）\n最关键的：不要因为'累'或'内疚'而放下手机，而是主动选择'我不需要再看了'。\n❌'唉，我又刷了这么久，算了不看了'（被动结束，带着自责）\n✅'好，现在够了，我主动选择放下手机'（主动结束，带着掌控感）\n这个主动关闭的动作，就是Day 3说的'直接拿'——你不是被手机放开的，你是主动选择离开的。\n\n具体场景——打开抖音/小红书/微信视频号时：\n1. 打开前，停3秒，深呼吸（Day 1：醒来）\n2. 心里说：'我看着我在刷'（Day 2：观众席）\n3. 刷的过程中，偶尔停下来感受身体（Day 2：回到观众席）\n4. 当你想'再刷一条'时，问：'如果我是那个不焦虑、有掌控感的人，我现在会怎么选？'（Day 3：从身份出发）\n5. 不管继续刷还是放下，都是主动选择，不是被推着走（Day 3：直接拿）\n\n关键：你不需要'完美执行'。下班回家玩手机这个场景，是高难度练习场——因为你累、你防御低、你惯性大。所以：如果10次里能做到1次'有意识玩'，就算成功；如果刷了2小时才发现'我一直在刷'，那正好——发现的这一刻就是Day 1的'醒来'；不要因为'没做好'而自责。自责是钟摆的养料。\n\n===== 关于'不愧疚'——反向操作 =====\n\n我：我最近有点反向操作了，就是以前我玩手机会愧疚，我现在不愧疚了。\n\nChatGPT：恭喜你。这不是'反向操作'，这是真正的进步。你正在经历一个非常关键的转变——从'被规则绑架'到'主动选择'。这才是Transurfing想让你到达的状态。\n\n旧状态：玩手机→愧疚→'我怎么又这样'→对抗自己→愧疚消耗能量，让你更累→愧疚让你第二天更想逃避（再刷更久）\n新状态：玩手机→不愧疚→'我选择玩，我享受玩'→接纳自己→不愧疚保留能量，让你放松→不愧疚让你更容易停下来（因为没压力）\n\n愧疚是钟摆的燃料。你停止喂食钟摆，就是最大的胜利。\n\n你的'不愧疚'恰好符合Day 2和Day 3：\n- Day 2：观察而不评判——你玩手机，但不再骂自己'浪费时间'——这就是不带评判的观察\n- Day 3：不请求、不要求、不争取——你不要求自己'必须完美'，不争取'控制每一分钟'——你直接选择'我现在想玩'\n\n你已经在用Transurfing了，只是没有用那些词来命名它。\n\n唯一需要留意的：不要从'愧疚'滑向'放纵'。\n健康的'不愧疚'：'我选择玩手机，我知道我在玩'——玩的时候享受，停的时候干脆——第二天不会报复性补偿——核心是主动选择\n不健康的'放纵'：'反正都这样了，随便刷吧'——玩的时候麻木，停的时候空虚——第二天会刷更久来逃避——核心是被动放弃\n\n那我应该怎么做？你不用分析这么多——\n1. 玩之前，问一句：'我现在是主动想玩，还是被动想逃？'问完就行，不需要回答。\n2. 玩的时候，偶尔停一下：刷几条后，停1秒，感受一下眼睛累不累？肩膀紧不紧？就感受，不做任何事。\n3. 放下的时候，说一句：'好了，我选择不看了。'然后放下，去做下一件事。\n如果做到了，继续。如果没做到，刷了2小时才发现。那就在发现的那一刻说：'哦，我刚被带走了。'然后放下，去做下一件事。\n\n核心就一句：不愧疚+有意识=正确。其他都不重要。去做。";
+
+PRESET_DATA[2].s = "醒来不是跳起来战斗，是先退一步看着它。Hack the game=不再被程序自动运行。不愧疚+有意识=正确。";
+
+PRESET_DATA[3].q = "1. 为什么要提上帝，上帝是人，人是上帝？还是说上帝是钟摆？\n\n2. AI举例：先停下来感受一下：'如果我是一个已经瘦了、且不需要证明自己瘦的人，我现在会怎么选择？'可能的结果：①自然地不想吃（因为身体不饿）；②自然地吃一块，享受，然后停（没有内疚）；③自然地选择别的东西吃。\n\n但是有可能很想吃但内心担心变胖。其实，很难自然地做选择啊——\n\nAI回答：你说的这种情况——'很想吃，但内心担心变胖，很难自然地做选择'——不是你的问题，而是这个体系设计的'训练场'。如果每次都能轻松选择，你就不需要练习了。恰恰是这种'拉扯感'出现的时候，才是你练习Day 3的机会。\n\n真正的'自然地选择'不是没有冲突，而是：你看到了冲突，但不被它卷走。\n\n错误理解：'自然地选择'=没有纠结，轻松就选了\n正确理解：'自然地选择'=纠结出现了，但你没有被它控制\n\n当'很想吃但担心胖'出现时，三步操作：\n\n第一步：不要试图'解决'它\n❌不要分析：'我为什么想吃？我是不是意志力不够？'\n❌不要压制：'不行，我不能吃！'\n❌不要放纵：'算了，反正我也瘦不下来。'\n这三件事，都是内在意念——你在用大脑和这个'想吃'打架。\n\n第二步：承认并观察\n✅停下来，对自己说：'哦，我现在想吃这个，同时我也在担心变胖。这两个感觉都在。'\n只是承认它们存在，不评判，不选边站。这个动作本身，就是'观众席'。\n\n第三步：问自己一个不同的问题\n❌不要问：'我该不该吃？'（这是大脑的战场）\n✅问：'如果我已经是一个健康、自信、不需要通过控制食物来证明自己的人——我现在会怎么选？'\n\n注意：这个问题不预设答案。\n有可能答案是'吃'——因为那个版本的你，不会把一块炸鸡当回事\n有可能答案是'不吃'——因为那个版本的你，身体根本不想要它\n有可能答案是'吃一口，然后放下'——因为那个版本的你，知道什么叫满足\n三种答案都是对的。关键不是答案是什么，关键是你从'哪个身份'在回答。\n\n旧模式（内在意念）：\n'我想吃…但我在减肥…不行…但真的好香…就吃一口…完了我吃了…我今天白费了…'\n→结果：不管吃还是不吃，你都输了。吃了内疚，不吃憋屈。\n\nDay 3模式（有意识的意念）：\n第一步：停下来。'哦，有想吃的感觉，也有担心的感觉。'\n第二步：问自己：'如果我是一个健康、自信的人，我现在会怎么选？'\n第三步：感受一下。\n可能结果A：你拿起炸鸡，咬了一口，认真嚼，觉得'嗯，好香'，然后放下。没有内疚。\n可能结果B：你看着炸鸡，觉得'好像没那么想吃'，然后关上冰箱。\n可能结果C：你吃了整块，觉得'真好吃'，然后第二天自然地吃得清淡一点。没有'我今天废了'的戏码。\n这三种结果，都是Day 3的实践。区别在于：你是主动选择的，不是被焦虑推着走的。\n\n如果选完还是焦虑怎么办？那就回到Day 2。\n'我观察到，我吃了炸鸡之后，现在有内疚感。我知道这是旧模式在说话。我不需要抗拒它，也不需要认同它。我只是看到它。'然后继续过你的日子。\n\n这本书的78天，不是让你'78天后就永远不焦虑了'。它是让你'78天后，焦虑出现时，你知道怎么和它相处'。\n\n也就是说，不是从情绪的角度来看，问自己想不想吃——\n\n对！你抓到最核心的区别了。\n问'我想不想吃'=被情绪绑架（大脑/身体的即时反应）\n问'如果我是已瘦版本的我，会怎么选'=从身份出发（主动选择）\n\n为什么'问自己想不想吃'是个陷阱？因为'想不想吃'是当下的身体/情绪反应，它天然就是波动、不可靠的：饿了想吃、压力大想吃、无聊了想吃、刚吃完不想吃、看见别人吃想吃、第二天早上后悔吃了。'想不想吃'取决于你此刻的状态——而你的状态，正是你要改变的东西。用你现在的状态来问'想不想'，然后做选择，等于让病人给自己开药方。\n\n那个'已瘦的我'不一定永远选'不吃'——她只是永远选择不带内疚。这才是关键。";
+PRESET_DATA[3].r = "1. 和焦虑共处，不是拉扯到没有焦虑，而是焦虑来了后，意识到并主动选择。\n2. 不从情绪的角度做选择，而是从已经站在终点的角度来主动选择。";
+PRESET_DATA[3].s = "我选择的目标，不需要向任何人、任何事证明。我不请求、不要求、不争取。我只是直接活在'已拥有'的感受里。";
+
+PRESET_DATA[4].q = "Day 4 说'自己定规则'——但我怎么知道哪些规则是我的、哪些是别人强加给我的？";
+
+PRESET_DATA[4].r = "===== Day 4: A Star Is Born 完整对话 =====\n\nChatGPT：这段话的核心只有一件事：别跟着别人定的规则玩，自己定规则。\n\n用你之前聊过的减肥和玩手机来翻译，你立刻就懂了：\n\n'被钟摆控制'=你在玩别人的游戏\n- 减肥：必须称体重、必须算卡路里、必须每天运动——这是社会/减肥博主定的规则\n- 玩手机：玩了就应该愧疚、应该自律——这是'应该'定的规则\n\n'自己定规则'=你开始玩自己的游戏\n- 减肥：我不称体重了，我感受'已瘦'的状态，自然行动\n- 玩手机：我玩的时候不内疚，我主动选择玩，主动选择停\n\n用你昨天的话来印证——你说：'我以前玩手机会愧疚，现在不愧疚了。'\n\n→这就是'走出队列'。你不再遵循'玩了就应该愧疚'这个大众规则了。你定了一个新规则：'我玩手机是主动选择，所以不需要愧疚。'\n\n原文 Principle 的完整意思：\n'In order to achieve real success, you have to stop following widely accepted stereotypes and walk your own path. Anyone who pulls out of the general system creates a new measure of success.'\n→为了取得真正的成功，你必须停止遵循被广泛接受的刻板印象，走自己的路。任何从一般系统中抽身而出的人，都会创造一个新的成功标准。\n\n'Pendulums cannot bear individuality. They spot a rising star and have no choice but to make of them a favourite.'\n→钟摆无法忍受个体性。它们发现一颗冉冉升起的新星时，别无选择，只能把它变成宠儿。\n\n'Once a new rule has been established, the ranks make a U-turn and start following the rising star.'\n→一旦新规则被建立，队列就会掉头，开始追随那颗新星。\n\n'In order to establish your own rules, you have to be yourself. You can do it. You simply have to claim the privilege.'\n→为了建立你自己的规则，你必须做自己。你可以的。你只需要声明这个特权。\n\n'Only you can decide what privileges you may or may not enjoy.'\n→只有你才能决定你可以或不可以享受哪些特权。\n\nInterpretation 核心翻译：\n人们一辈子都在被告知自己远非完美，成功、财富和名望是精英的遗产。钟摆并不否认任何人都能成功，但它们小心翼翼地隐藏了一个事实：每个人都有自己独特的品质和能力。对钟摆来说，个体性就像死亡本身。如果所有追随者都成为摆脱操控绳索的自由个体，钟摆就会直接崩塌。\n\n星星是独立诞生的，但钟摆把它们点亮。榜样、成功标准是被刻意创造出来的，用来把大众的渴望驱向一个方向。换句话说，钟摆的任务是把所有人都赶进一个单一队列，强迫他们服从一个共同规则。\n\n你什么也实现不了，直到你意识到你必须从那队列中走出来。玩别人制定的游戏毫无意义——因为你不是制定规则的人。不管做什么，永远启动你自己的游戏。这就是成功的秘密。\n\n实操建议——今天只做一件事：在某个场景里，做一个'大众不会这么做'的小选择。比如：别人都在加班，你准时走；别人都在节食，你坦然吃一口想吃的；别人都在刷短视频，你刷了但不愧疚。做了就行，不需要结果。这个动作本身就是在练习'自己定规则'。";
+
+PRESET_DATA[6].q = "'你恨什么，那个恨就会弹回来'——那如果我假装不在意，是不是也在扔'假装'的回旋镖？假装不行的吧？";
+
+PRESET_DATA[6].r = "===== Day 6: The Boomerang 完整对话 =====\n\nChatGPT：Day 6 回旋镖——你扔出什么，就弹回什么。原文：'Whatever thoughts you send out into the world, they will return to you like a boomerang.'\n\n你用恨填满心和脑，那个清晰、尖锐的恨的画面会被镜子反射，填满你整个世界的层次。结果你更激动，情绪更强。你心里想把所有人都送进地狱——'都给我滚！'——但镜子把回旋镖弹回来，你自己去了地狱。\n\n小心向世界之镜发送负面能量。如果你发了，你会完全出乎意料地收到同样的回应。\n\n顺便说一句——爱也是回旋镖。\n\n===== 翻译成减肥 =====\n\n- 你恨自己的体重→回旋镖弹回来→你更恨自己、更焦虑\n- 你讨厌'我又没控制住'→回旋镖弹回来→你更失控\n- 你爱自己的身体（哪怕现在不是理想状态）→回旋镖弹回来→你开始对自己的身体有耐心\n\n你今天站在镜子前，是挑剔自己'这里胖了'，还是说'嗯，今天看起来不错'？你扔出什么，你就收到什么。\n\nInterpretation 原文核心翻译：\n思想在世界之镜中物质化。比如，如果你对自己的外表不满意，你照着镜子毫无乐趣。你把注意力全部集中在你讨厌的地方，然后把它陈述为一个事实。你必须明白：你在镜子里被反射成什么样，对应的是你对自己的感觉。\n\n采纳一条新规则：不要盯着镜子看——偷瞄镜子。找出积极的、忽略其他一切。把你看到的所有东西都通过这个滤镜。把注意力集中在你想要的东西上。\n\n你以前怎么做的？你陈述事实：'我不喜欢自己。我不喜欢我的世界。'镜子只是更坚定地确认：'没错，就是这样。'\n\n现在你有一个不同的任务：找出你爱的东西，同时在心里描绘你想要的画面。从现在开始，你只做一件事——寻找并找到确认正面变化正在发生的迹象。你会发现事情一天比一天更好。如果你经常这样练习，用不了多久你就会惊到下巴掉下来。\n\n===== 关于假装的关键区分 =====\n\n我问：如果我很想吃炸鸡，但我假装我不在意，这是不是也在扔'假装'的回旋镖？\n\nChatGPT：对。这就是Day 7最精确的应用。\n\n❌假装的画面：'我不饿、我不饿、我不饿'——这是对抗，是排斥，是在对镜子说'别照出这个！'\n\n✅真实的画面：'如果我已经健康了，我的身体会怎么选择？'——这是从身份出发，不是对抗\n\n区分：\n对抗=你对镜子说'别照出这个！'\n选择=你转身先画一幅新画，再挂到镜子前\n\n===== 实操 =====\n\n每天出门前/吃饭前/打开手机前，先做这一件事：花30秒，闭眼，感受：'如果我已经是我想要的那个版本的我了，我现在是什么感觉？'然后睁眼，该干嘛干嘛。\n\n这30秒，就是你在'制作画面'。其他时间，都是'看镜子'。\n\n为什么'先制作画面'这么重要？因为'看镜子'是被动接收，你看到什么就是什么。'制作画面'是主动发送，你在给镜子下新的订单。\n\n大部分人一辈子都在看镜子、抱怨镜子、试图擦镜子。而你知道：先画好画面，镜子自然会跟着变。";
+
+PRESET_DATA[6].s = "先改看法（Day 5）→再管输出（Day 6）→最后改画面（Day 7）。大部分人看镜子、抱怨镜子、擦镜子。你：先画好画面，镜子自然会变。对抗=对镜子说'别照出这个！'；选择=转身画新画，挂到镜子前。";
+
+function loadPresetContent() {
+  if (!confirm('导入前20天英文 Principle + Interpretation，以及从ChatGPT对话中提取的疑问/反思/总结。已有英文内容不会被覆盖。继续？')) return;
+  var count = 0;
+  for (var dayNum = 1; dayNum <= 20; dayNum++) {
+    var idx = DAYS.findIndex(function(d){return d.day===dayNum;});
+    if (idx < 0) continue;
+    var data = PRESET_DATA[dayNum];
+    if (!data) continue;
+    if (!localStorage.getItem(storageKey(idx, 'principleEn'))) {
+      localStorage.setItem(storageKey(idx, 'principleEn'), data.p);
+      count++;
+    }
+    if (!localStorage.getItem(storageKey(idx, 'interpretationEn'))) {
+      localStorage.setItem(storageKey(idx, 'interpretationEn'), data.i);
+      count++;
+    }
+    // Chat insights: questions (q), reflections (r), summary (s)
+    if (data.q) { localStorage.setItem(storageKey(idx, 'questions'), data.q); count++; }
+    if (data.r) { localStorage.setItem(storageKey(idx, 'reflections'), data.r); count++; }
+    if (data.s) { localStorage.setItem(storageKey(idx, 'summary'), data.s); count++; }
+    if (data.pc) { localStorage.setItem(storageKey(idx, 'principleCn'), data.pc); count++; }
+    if (data.ic) { localStorage.setItem(storageKey(idx, 'interpretationCn'), data.ic); count++; }
+  }
+  renderSidebar();
+  renderMain();
+  renderCalendar();
+  updateProgress();
+  alert('完成！已导入 ' + count + ' 条内容。切换到 Day 1 查看。');
+  switchToDay(0);
+}
+
+init();
+</script>
+</body>
+</html>
