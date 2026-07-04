@@ -384,12 +384,17 @@ body {
   body { grid-template-columns: 1fr; }
   .sidebar {
     position: fixed; left: 0; top: 0; height: 100vh; width: 280px;
-    z-index: 100;
+    z-index: 100; display: flex; flex-direction: column;
     transform: translateX(-100%);
     transition: transform 0.25s ease;
     box-shadow: var(--shadow-lg);
   }
   .sidebar.open { transform: translateX(0); }
+  .day-nav { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
+  .sidebar-footer { flex-shrink: 0; padding: 4px 8px; }
+  .sidebar-footer button { padding: 3px 4px; font-size: 0.62rem; }
+  .sidebar-header { padding: 10px 14px 8px; }
+  .sidebar-header h1 { font-size: 0.85rem; }
   .mobile-menu-btn { display: inline-block; }
   .cards-grid { grid-template-columns: 1fr; }
   .content-scroll { padding: 16px 14px 32px; }
