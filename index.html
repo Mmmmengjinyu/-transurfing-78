@@ -1960,19 +1960,45 @@ function downloadFromCloud() {
   fetchGistContent(gistId, token);
 }
 
-function fetchGistContent(gistId, token) {
+function fetchGistContent(gistId, token, silent) {
   fetch('https://api.github.com/gists/' + gistId, {
     headers: { 'Authorization': 'token ' + token }
   }).then(function(r){ return r.json(); }).then(function(data){
     var filename = 'transurfing-78-data.json';
     var file = data.files && data.files[filename];
-    if (!file || !file.content) { alert('云端数据为空。'); return; }
+    if (!file || !file.content) { if (!silent) alert('云端数据为空。'); return; }
     try {
       var payload = JSON.parse(file.content);
       restoreAllData(payload);
-      alert('数据已从云端恢复！');
-    } catch(e) { alert('数据解析失败。'); }
-  }).catch(function(e){ alert('下载失败: ' + e.message); });
+      if (!silent) alert('数据已从云端恢复！');
+    } catch(e) { if (!silent) alert('数据解析失败。'); }
+  }).catch(function(e){ if (!silent) alert('下载失败: ' + e.message); });
+}
+
+function downloadFromCloud() {
+  var token = getGistToken();
+  if (!token) { alert('请先点击 ⚙️ 设置按钮，输入 GitHub Token。'); return; }
+  var gistId = getGistId();
+  if (!gistId) {
+    fetch('https://api.github.com/gists', {
+      headers: { 'Authorization': 'token ' + token }
+    }).then(function(r){ return r.json(); }).then(function(gists){
+      var found = null;
+      for (var i = 0; i < gists.length; i++) {
+        if (gists[i].description && gists[i].description.indexOf('Transurfing') >= 0) {
+          found = gists[i]; break;
+        }
+      }
+      if (found) {
+        localStorage.setItem(gistIdKey, found.id);
+        fetchGistContent(found.id, token);
+      } else {
+        alert('未找到云端备份。请先在电脑端上传一次数据。');
+      }
+    }).catch(function(e){ alert('请求失败，请检查 Token 是否正确。'); });
+    return;
+  }
+  fetchGistContent(gistId, token);
 }
 
 // Hook saveField to auto-upload
@@ -2005,6 +2031,13 @@ function init() {
   try { updateProgress(); } catch(e) { alert('updateProgress错误: '+e.message); return; }
   localStorage.setItem(STORAGE_PREFIX + 'currentDay', DAYS[currentDay].day);
   restoreFocusMode();
+  // Auto-download from cloud on page load
+  if (getGistToken()) {
+    setTimeout(function(){
+      var gid = getGistId();
+      if (gid) fetchGistContent(gid, getGistToken(), true);
+    }, 500);
+  }
 }
 
 /* ============================================
