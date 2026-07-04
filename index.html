@@ -358,6 +358,8 @@ body {
 .editable i, .editable em { font-style: italic; }
 .editable u { text-decoration: underline; }
 .editable .hl { background: #fef3a0; padding: 0 2px; border-radius: 2px; }
+.editable ul, .editable ol { padding-left: 24px; margin: 8px 0; }
+.editable li { margin-bottom: 4px; }
 .card-body textarea:focus { outline: none; }
 .card-body textarea::placeholder { color: #c4b998; font-style: italic; }
 .card-body .saved-indicator {
@@ -737,6 +739,8 @@ body.focus-mode .main-header { padding-left: 28px; }
   <button onclick="fmt('underline')" title="下划线 (Ctrl+U)"><u>U</u></button>
   <span class="fmt-sep"></span>
   <button class="fmt-highlight" onclick="fmt('highlight')" title="高亮">🖊</button>
+  <span class="fmt-sep"></span>
+  <button onclick="fmt('insertUnorderedList')" title="无序列表">•≡</button>
 </div>
 
 <!-- AI Chat Launcher -->
