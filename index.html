@@ -736,6 +736,8 @@ body.focus-mode .main-header { padding-left: 28px; }
 
     <!-- Supplement reading view (hidden by default) -->
     <div id="supplementView" style="display:none; max-width:1100px;"></div>
+    <!-- Daily Read view (hidden by default) -->
+    <div id="dailyReadView" style="display:none; max-width:1100px;"></div>
 
   </div>
 </main>
@@ -1005,6 +1007,26 @@ function renderSidebar() {
     4: { label:'🏁 Part 4 · Day 61–78 · Completion / 完成' }
   };
 
+  // Daily Read section
+  var drGroup = document.createElement('div');
+  drGroup.className = 'part-group';
+  if (currentView !== 'dailyread') drGroup.classList.add('collapsed');
+  var drToggle = document.createElement('button');
+  drToggle.className = 'part-toggle';
+  drToggle.innerHTML = '<span class="arrow">▼</span> 📖 每日一读';
+  drToggle.onclick = function(){ drGroup.classList.toggle('collapsed'); };
+  drGroup.appendChild(drToggle);
+  var drList = document.createElement('ul');
+  drList.className = 'day-list';
+  var drLi = document.createElement('li'); drLi.className = 'day-item';
+  var drLink = document.createElement('button');
+  drLink.className = 'day-link' + (currentView==='dailyread' ? ' active' : '');
+  drLink.innerHTML = '<span class="dot filled"></span><span class="day-title">每日一读</span>';
+  drLink.onclick = function(){ switchToDailyRead(); };
+  drLi.appendChild(drLink); drList.appendChild(drLi);
+  drGroup.appendChild(drList);
+  $dayNav.appendChild(drGroup);
+
   parts.forEach(partNum => {
     const group = document.createElement('div');
     group.className = 'part-group';
@@ -1086,6 +1108,33 @@ function renderSidebar() {
 var currentView = 'day'; // 'day' or 'supplement'
 var currentSuppIndex = 0;
 
+function switchToDailyRead() {
+  currentView = 'dailyread';
+  renderSidebar();
+  renderDailyRead();
+  closeSidebar();
+}
+function renderDailyRead() {
+  document.getElementById('cardsGrid').style.display = 'none';
+  document.getElementById('supplementView').style.display = 'none';
+  var view = document.getElementById('dailyReadView');
+  view.style.display = 'block';
+  $dayNum.textContent = '📖';
+  $dayTitleBoth.textContent = '每日一读';
+  document.title = '每日一读 — Transurfing 78';
+  $prevBtn.disabled = true;
+  $nextBtn.disabled = true;
+  var saved = localStorage.getItem(STORAGE_PREFIX + 'dailyread') || '';
+  view.innerHTML = '<div class="supp-card"><div class="editable text-en" contenteditable="true" id="dailyReadEdit" oninput="autoSaveDailyRead()" style="min-height:400px;padding:20px 24px;line-height:1.8;" data-placeholder="在这里写下每日的句子、肯定语、感悟...">' + saved + '</div></div>';
+}
+function autoSaveDailyRead() {
+  clearTimeout(window._drSaveTimer);
+  window._drSaveTimer = setTimeout(function(){
+    var el = document.getElementById('dailyReadEdit');
+    if (el) localStorage.setItem(STORAGE_PREFIX + 'dailyread', el.innerHTML);
+  }, 500);
+}
+
 function switchToSupplement(index) {
   currentView = 'supplement';
   currentSuppIndex = index;
@@ -1109,6 +1158,7 @@ function renderMain() {
   if (currentView === 'supplement') { renderSupplement(); return; }
   document.getElementById('cardsGrid').style.display = '';
   document.getElementById('supplementView').style.display = 'none';
+  document.getElementById('dailyReadView').style.display = 'none';
   const d = DAYS[currentDay];
   $dayNum.textContent = d.day;
   var customTitle = localStorage.getItem(STORAGE_PREFIX + 'd' + d.day + '_title');
@@ -1212,6 +1262,7 @@ function renderSupplement() {
   $nextBtn.disabled = si === supplements.length - 1;
 
   document.getElementById('cardsGrid').style.display = 'none';
+  document.getElementById('dailyReadView').style.display = 'none';
   var view = document.getElementById('supplementView');
   view.style.display = 'block';
 
