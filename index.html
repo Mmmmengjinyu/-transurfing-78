@@ -751,6 +751,14 @@ body.focus-mode .main-header { padding-left: 28px; }
   <button class="fmt-highlight" onclick="fmt('highlight')" title="高亮">🖊</button>
   <span class="fmt-sep"></span>
   <button onclick="fmt('insertUnorderedList')" title="无序列表">•≡</button>
+  <span class="fmt-sep"></span>
+  <button onclick="fmt('fontSize','small')" title="小号字">A-</button>
+  <button onclick="fmt('fontSize','normal')" title="正常字号">A</button>
+  <button onclick="fmt('fontSize','large')" title="大号字">A+</button>
+  <span class="fmt-sep"></span>
+  <button onclick="fmt('lineHeight','1.4')" title="紧凑行距">≡</button>
+  <button onclick="fmt('lineHeight','1.8')" title="正常行距">☰</button>
+  <button onclick="fmt('lineHeight','2.4')" title="宽松行距">≣</button>
 </div>
 
 <!-- AI Chat Launcher -->
@@ -1471,9 +1479,43 @@ if (toolbar) {
   toolbar.addEventListener('mouseleave', function(){ hideToolbar(); });
 }
 
-function fmt(cmd) {
+function fmt(cmd, val) {
   if (!activeEditor) return;
   activeEditor.focus();
+  if (cmd === 'fontSize') {
+    var sizes = {small:'0.78rem', normal:'0.9rem', large:'1.15rem'};
+    document.execCommand('fontSize', false, '4');
+    var fonts = activeEditor.querySelectorAll('font[size="4"]');
+    fonts.forEach(function(f){
+      var span = document.createElement('span');
+      span.style.fontSize = sizes[val] || '0.9rem';
+      while(f.firstChild) span.appendChild(f.firstChild);
+      f.parentNode.replaceChild(span, f);
+    });
+    activeEditor.dispatchEvent(new Event('input', {bubbles:true}));
+    return;
+  }
+  if (cmd === 'lineHeight') {
+    var sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    var range = sel.getRangeAt(0);
+    if (range.collapsed) {
+      // Apply to entire editable area
+      activeEditor.style.lineHeight = val;
+    } else {
+      // Wrap selection in span with line-height
+      var span = document.createElement('span');
+      span.style.lineHeight = val; span.style.display = 'inline-block'; span.style.width = '100%';
+      try { range.surroundContents(span); } catch(e){
+        var contents = range.extractContents();
+        span.appendChild(contents);
+        range.insertNode(span);
+      }
+    }
+    activeEditor.dispatchEvent(new Event('input', {bubbles:true}));
+    sel.removeAllRanges();
+    return;
+  }
   if (cmd === 'highlight') {
     // Toggle highlight: wrap selection in <span class="hl">
     var sel = window.getSelection();
