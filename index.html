@@ -281,6 +281,7 @@ body {
 .card-reflect .card-header { color: var(--accent-reflect); }
 .card-summary .card-header { color: var(--accent-summary); }
 .card-gratitude .card-header { color: #8b5e9b; }
+.card-action .card-header { color: #c47b3b; }
 
 .card-body { display: flex; min-height: 0; }
 .card-body-split { flex-direction: column; gap: 0; }
@@ -722,11 +723,18 @@ body.focus-mode .main-header { padding-left: 28px; }
         </div>
       </div>
 
-      <!-- Summary + Gratitude Journal -->
+      <!-- Summary + Action + Gratitude (3-col row) -->
+      <div class="bottom-row">
       <div class="card card-summary">
         <div class="card-header"><span class="card-icon">✍️</span> 总结</div>
         <div class="card-body">
           <div id="summary" class="editable" contenteditable="true" data-placeholder="用一句话总结今天的收获..."></div>
+        </div>
+      </div>
+      <div class="card card-action">
+        <div class="card-header"><span class="card-icon">🎯</span> 今日行动</div>
+        <div class="card-body">
+          <div id="action" class="editable" contenteditable="true" data-placeholder="今天我做了一个什么小动作？哪怕很小，但和今天的内容有关..."></div>
         </div>
       </div>
       <div class="card card-gratitude">
@@ -735,12 +743,15 @@ body.focus-mode .main-header { padding-left: 28px; }
           <div id="gratitude" class="editable" contenteditable="true" data-placeholder="今天值得感恩的事..."></div>
         </div>
       </div>
+      </div>
     </div>
 
     <!-- Supplement reading view (hidden by default) -->
     <div id="supplementView" style="display:none; max-width:1100px;"></div>
     <!-- Daily Read view (hidden by default) -->
     <div id="dailyReadView" style="display:none; max-width:1100px;"></div>
+    <!-- Weekly Review view (hidden by default) -->
+    <div id="weeklyView" style="display:none; max-width:1100px;"></div>
 
   </div>
 </main>
@@ -923,7 +934,7 @@ const $progressBar   = document.getElementById('progressBar');
 const $progressText  = document.getElementById('progressText');
 const $mobileMenuBtn = document.getElementById('mobileMenuBtn');
 
-const textareaIds = ['principleEn','interpretationEn','principleCn','interpretationCn','questions','reflections','summary','gratitude'];
+const textareaIds = ['principleEn','interpretationEn','principleCn','interpretationCn','questions','reflections','summary','action','gratitude'];
 const textareas = {};
 textareaIds.forEach(id => { textareas[id] = document.getElementById(id); });
 
@@ -1038,6 +1049,26 @@ function renderSidebar() {
   drGroup.appendChild(drList);
   $dayNav.appendChild(drGroup);
 
+  // Weekly Review section
+  var wrGroup = document.createElement('div');
+  wrGroup.className = 'part-group';
+  if (currentView !== 'weekly') wrGroup.classList.add('collapsed');
+  var wrToggle = document.createElement('button');
+  wrToggle.className = 'part-toggle';
+  wrToggle.innerHTML = '<span class="arrow">▼</span> 📋 每周记录';
+  wrToggle.onclick = function(){ wrGroup.classList.toggle('collapsed'); };
+  wrGroup.appendChild(wrToggle);
+  var wrList = document.createElement('ul');
+  wrList.className = 'day-list';
+  var wrLi = document.createElement('li'); wrLi.className = 'day-item';
+  var wrLink = document.createElement('button');
+  wrLink.className = 'day-link' + (currentView==='weekly' ? ' active' : '');
+  wrLink.innerHTML = '<span class="dot filled"></span><span class="day-title">每周记录</span>';
+  wrLink.onclick = function(){ switchToWeekly(); };
+  wrLi.appendChild(wrLink); wrList.appendChild(wrLi);
+  wrGroup.appendChild(wrList);
+  $dayNav.appendChild(wrGroup);
+
   parts.forEach(partNum => {
     const group = document.createElement('div');
     group.className = 'part-group';
@@ -1146,6 +1177,35 @@ function autoSaveDailyRead() {
   }, 500);
 }
 
+function switchToWeekly() {
+  currentView = 'weekly';
+  renderSidebar();
+  renderWeekly();
+  closeSidebar();
+}
+function renderWeekly() {
+  document.getElementById('cardsGrid').style.display = 'none';
+  document.getElementById('supplementView').style.display = 'none';
+  document.getElementById('dailyReadView').style.display = 'none';
+  document.getElementById('weeklyView').style.display = 'none';
+  var view = document.getElementById('weeklyView');
+  view.style.display = 'block';
+  $dayNum.textContent = '📋';
+  $dayTitleBoth.textContent = '每周记录';
+  document.title = '每周记录 — Transurfing 78';
+  $prevBtn.disabled = true;
+  $nextBtn.disabled = true;
+  var saved = localStorage.getItem(STORAGE_PREFIX + 'weekly') || '';
+  view.innerHTML = '<div class="supp-card"><div class="editable" contenteditable="true" id="weeklyEdit" oninput="autoSaveWeekly()" style="min-height:400px;padding:20px 24px;line-height:1.7;" data-placeholder="每周一次的回顾：这周我做了什么行动？有什么变化？下周想尝试什么？">' + saved + '</div></div>';
+}
+function autoSaveWeekly() {
+  clearTimeout(window._wrSaveTimer);
+  window._wrSaveTimer = setTimeout(function(){
+    var el = document.getElementById('weeklyEdit');
+    if (el) localStorage.setItem(STORAGE_PREFIX + 'weekly', el.innerHTML);
+  }, 500);
+}
+
 function switchToSupplement(index) {
   currentView = 'supplement';
   currentSuppIndex = index;
@@ -1170,6 +1230,7 @@ function renderMain() {
   document.getElementById('cardsGrid').style.display = '';
   document.getElementById('supplementView').style.display = 'none';
   document.getElementById('dailyReadView').style.display = 'none';
+  document.getElementById('weeklyView').style.display = 'none';
   const d = DAYS[currentDay];
   $dayNum.textContent = d.day;
   var customTitle = localStorage.getItem(STORAGE_PREFIX + 'd' + d.day + '_title');
@@ -1274,6 +1335,7 @@ function renderSupplement() {
 
   document.getElementById('cardsGrid').style.display = 'none';
   document.getElementById('dailyReadView').style.display = 'none';
+  document.getElementById('weeklyView').style.display = 'none';
   var view = document.getElementById('supplementView');
   view.style.display = 'block';
 
