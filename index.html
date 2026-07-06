@@ -363,9 +363,8 @@ body {
 .editable .hl { background: #fef3a0; padding: 0 2px; border-radius: 2px; }
 .editable ul, .editable ol { padding-left: 24px; margin: 8px 0; }
 .editable li { margin-bottom: 4px; }
-.editable p { margin: 0 0 0.7em 0; line-height: inherit; }
-.editable div { margin: 0 0 0.7em 0; line-height: inherit; }
-.editable p:last-child, .editable div:last-child { margin-bottom: 0; }
+.editable > p, .editable > div { margin: 0 0 0.7em 0; line-height: inherit; }
+.editable > p:last-child, .editable > div:last-child { margin-bottom: 0; }
 .card-body textarea:focus { outline: none; }
 .card-body textarea::placeholder { color: #c4b998; font-style: italic; }
 .card-body .saved-indicator {
