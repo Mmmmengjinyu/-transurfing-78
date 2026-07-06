@@ -1660,15 +1660,22 @@ function saveAnnotation() {
   span.textContent = annotateRange.toString();
   annotateRange.deleteContents();
   annotateRange.insertNode(span);
+  var editor = annotateEditor;
   cancelAnnotate();
-  // Force immediate save
+  // Force immediate save - save the editor's content directly
+  var editorId = editor.id;
+  if (textareaIds.indexOf(editorId) >= 0) {
+    var idx = DAYS.findIndex(function(d){return d.day === DAYS[currentDay].day;});
+    localStorage.setItem(storageKey(idx, editorId), editor.innerHTML);
+    updateProgress();
+  } else if (editorId === 'dailyReadEdit') {
+    localStorage.setItem(STORAGE_PREFIX + 'dailyread', editor.innerHTML);
+  } else if (editorId === 'weeklyEdit') {
+    localStorage.setItem(STORAGE_PREFIX + 'weekly', editor.innerHTML);
+  }
+  // Also save other fields in case they changed
   saveCurrentContent();
   clearTimeout(window._drSaveTimer); clearTimeout(window._wrSaveTimer);
-  if (annotateEditor.id === 'dailyReadEdit') {
-    localStorage.setItem(STORAGE_PREFIX + 'dailyread', annotateEditor.innerHTML);
-  } else if (annotateEditor.id === 'weeklyEdit') {
-    localStorage.setItem(STORAGE_PREFIX + 'weekly', annotateEditor.innerHTML);
-  }
   uploadToCloud();
   autoResize(annotateEditor);
 }
