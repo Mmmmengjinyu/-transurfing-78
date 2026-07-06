@@ -363,8 +363,8 @@ body {
 .editable .hl { background: #fef3a0; padding: 0 2px; border-radius: 2px; }
 .editable ul, .editable ol { padding-left: 24px; margin: 8px 0; }
 .editable li { margin-bottom: 4px; }
-.editable > p, .editable > div { margin: 0 0 0.7em 0; line-height: inherit; }
-.editable > p:last-child, .editable > div:last-child { margin-bottom: 0; }
+.editable p { margin: 0 0 0.7em 0; line-height: inherit; }
+.editable p:last-child { margin-bottom: 0; }
 .card-body textarea:focus { outline: none; }
 .card-body textarea::placeholder { color: #c4b998; font-style: italic; }
 .card-body .saved-indicator {
@@ -2184,6 +2184,8 @@ if (getGistToken()) {
    INIT
    ============================================ */
 function init() {
+  // Force browsers to use <p> instead of <div> for Enter in contenteditable
+  try { document.execCommand('defaultParagraphSeparator', false, 'p'); } catch(e) {}
   const savedDay = localStorage.getItem(STORAGE_PREFIX + 'currentDay');
   if (savedDay !== null) {
     const dayNum = parseInt(savedDay);
