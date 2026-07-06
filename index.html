@@ -1716,16 +1716,22 @@ saveAnnotation = function(){
     else window._editVocabEl.removeAttribute('data-ph');
     window._editVocabEl = null;
     document.getElementById('annotatePopup').querySelector('div:first-child').textContent = '标注词汇';
+    var ed = window._editVocabOrigEditor;
     cancelAnnotate();
-    saveCurrentContent();
-    clearTimeout(window._drSaveTimer); clearTimeout(window._wrSaveTimer);
-    if (window._editVocabOrigEditor) {
-      if (window._editVocabOrigEditor.id === 'dailyReadEdit') {
-        localStorage.setItem(STORAGE_PREFIX + 'dailyread', window._editVocabOrigEditor.innerHTML);
-      } else if (window._editVocabOrigEditor.id === 'weeklyEdit') {
-        localStorage.setItem(STORAGE_PREFIX + 'weekly', window._editVocabOrigEditor.innerHTML);
+    if (ed) {
+      var eid = ed.id;
+      if (textareaIds.indexOf(eid) >= 0) {
+        var idx = DAYS.findIndex(function(d){return d.day === DAYS[currentDay].day;});
+        localStorage.setItem(storageKey(idx, eid), ed.innerHTML);
+        updateProgress();
+      } else if (eid === 'dailyReadEdit') {
+        localStorage.setItem(STORAGE_PREFIX + 'dailyread', ed.innerHTML);
+      } else if (eid === 'weeklyEdit') {
+        localStorage.setItem(STORAGE_PREFIX + 'weekly', ed.innerHTML);
       }
     }
+    saveCurrentContent();
+    clearTimeout(window._drSaveTimer); clearTimeout(window._wrSaveTimer);
     uploadToCloud();
     return;
   }
