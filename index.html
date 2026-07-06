@@ -1797,6 +1797,7 @@ function switchToVocab() {
   closeSidebar();
 }
 function renderVocabList() {
+  migrateVocabFromContent(); // always re-scan on open
   document.getElementById('cardsGrid').style.display = 'none';
   document.getElementById('supplementView').style.display = 'none';
   document.getElementById('dailyReadView').style.display = 'none';
@@ -2441,7 +2442,7 @@ function fetchGistContent(gistId, token, silent) {
       restoreAllData(payload);
       if (!silent) alert('数据已从云端恢复！');
     } catch(e) { if (!silent) alert('数据解析失败。'); }
-  }).catch(function(e){ if (!silent) alert('下载失败: ' + e.message); });
+  }).catch(function(e){ if (!silent) alert('下载失败: ' + e.message + '\n\n请检查：\n1. Token 是否已设置（点 ⚙️）\n2. 网络是否能访问 github.com'); });
 }
 
 function downloadFromCloud() {
