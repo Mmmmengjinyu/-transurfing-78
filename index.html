@@ -1178,7 +1178,8 @@ function autoSaveDailyRead() {
   window._drSaveTimer = setTimeout(function(){
     var el = document.getElementById('dailyReadEdit');
     if (el) localStorage.setItem(STORAGE_PREFIX + 'dailyread', el.innerHTML);
-  }, 500);
+    uploadToCloud();
+  }, 1500);
 }
 
 function switchToWeekly() {
@@ -1211,7 +1212,8 @@ function autoSaveWeekly() {
   window._wrSaveTimer = setTimeout(function(){
     var el = document.getElementById('weeklyEdit');
     if (el) localStorage.setItem(STORAGE_PREFIX + 'weekly', el.innerHTML);
-  }, 500);
+    uploadToCloud();
+  }, 1500);
 }
 
 function switchToSupplement(index) {
