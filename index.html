@@ -1661,8 +1661,15 @@ function saveAnnotation() {
   annotateRange.deleteContents();
   annotateRange.insertNode(span);
   cancelAnnotate();
-  // Trigger save
-  annotateEditor.dispatchEvent(new Event('input', {bubbles:true}));
+  // Force immediate save
+  saveCurrentContent();
+  clearTimeout(window._drSaveTimer); clearTimeout(window._wrSaveTimer);
+  if (annotateEditor.id === 'dailyReadEdit') {
+    localStorage.setItem(STORAGE_PREFIX + 'dailyread', annotateEditor.innerHTML);
+  } else if (annotateEditor.id === 'weeklyEdit') {
+    localStorage.setItem(STORAGE_PREFIX + 'weekly', annotateEditor.innerHTML);
+  }
+  uploadToCloud();
   autoResize(annotateEditor);
 }
 
@@ -1686,6 +1693,7 @@ document.addEventListener('click', function(e){
   popup.style.display = 'block';
   // Update on save
   window._editVocabEl = vocab;
+  window._editVocabOrigEditor = vocab.closest('[contenteditable]');
   setTimeout(function(){ document.getElementById('annotateTr').focus(); }, 100);
 });
 
@@ -1702,7 +1710,16 @@ saveAnnotation = function(){
     window._editVocabEl = null;
     document.getElementById('annotatePopup').querySelector('div:first-child').textContent = '标注词汇';
     cancelAnnotate();
-    if (annotateEditor) annotateEditor.dispatchEvent(new Event('input', {bubbles:true}));
+    saveCurrentContent();
+    clearTimeout(window._drSaveTimer); clearTimeout(window._wrSaveTimer);
+    if (window._editVocabOrigEditor) {
+      if (window._editVocabOrigEditor.id === 'dailyReadEdit') {
+        localStorage.setItem(STORAGE_PREFIX + 'dailyread', window._editVocabOrigEditor.innerHTML);
+      } else if (window._editVocabOrigEditor.id === 'weeklyEdit') {
+        localStorage.setItem(STORAGE_PREFIX + 'weekly', window._editVocabOrigEditor.innerHTML);
+      }
+    }
+    uploadToCloud();
     return;
   }
   _origSaveAnnotation();
@@ -1712,6 +1729,7 @@ function cancelAnnotate() {
   document.getElementById('annotatePopup').style.display = 'none';
   annotateRange = null; annotateEditor = null;
   window._editVocabEl = null;
+  window._editVocabOrigEditor = null;
   document.getElementById('annotatePopup').querySelector('div:first-child').textContent = '标注词汇';
 }
 
