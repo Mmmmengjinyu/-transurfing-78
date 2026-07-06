@@ -1167,6 +1167,10 @@ function renderDailyRead() {
   $nextBtn.disabled = true;
   var saved = localStorage.getItem(STORAGE_PREFIX + 'dailyread') || '';
   view.innerHTML = '<div class="supp-card"><div class="editable text-en" contenteditable="true" id="dailyReadEdit" oninput="autoSaveDailyRead()" style="min-height:400px;padding:20px 24px;line-height:1.8;" data-placeholder="在这里写下每日的句子、肯定语、感悟...">' + saved + '</div></div>';
+  setTimeout(function(){
+    var el = document.getElementById('dailyReadEdit');
+    if (el) { el.addEventListener('focus', function(){ showToolbarFor(el); }); el.addEventListener('blur', function(){ setTimeout(hideToolbar, 150); }); }
+  }, 100);
 }
 function autoSaveDailyRead() {
   clearTimeout(window._drSaveTimer);
@@ -1196,6 +1200,10 @@ function renderWeekly() {
   $nextBtn.disabled = true;
   var saved = localStorage.getItem(STORAGE_PREFIX + 'weekly') || '';
   view.innerHTML = '<div class="supp-card"><div class="editable" contenteditable="true" id="weeklyEdit" oninput="autoSaveWeekly()" style="min-height:400px;padding:20px 24px;line-height:1.7;" data-placeholder="每周一次的回顾：这周我做了什么行动？有什么变化？下周想尝试什么？">' + saved + '</div></div>';
+  setTimeout(function(){
+    var el = document.getElementById('weeklyEdit');
+    if (el) { el.addEventListener('focus', function(){ showToolbarFor(el); }); el.addEventListener('blur', function(){ setTimeout(hideToolbar, 150); }); }
+  }, 100);
 }
 function autoSaveWeekly() {
   clearTimeout(window._wrSaveTimer);
@@ -1542,6 +1550,18 @@ if (toolbar) {
   toolbar.addEventListener('mouseenter', function(){ toolbar.classList.add('show'); });
   toolbar.addEventListener('mouseleave', function(){ hideToolbar(); });
 }
+// Show toolbar on text selection
+document.addEventListener('selectionchange', function(){
+  var sel = window.getSelection();
+  if (!sel || sel.isCollapsed || !sel.rangeCount) return;
+  var node = sel.anchorNode;
+  if (!node) return;
+  var editable = node.nodeType === 3 ? node.parentElement.closest('[contenteditable]') : node.closest('[contenteditable]');
+  if (editable) {
+    activeEditor = editable;
+    showToolbarFor(editable);
+  }
+});
 
 function fmt(cmd, val) {
   if (!activeEditor) return;
