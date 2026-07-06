@@ -1158,6 +1158,7 @@ function switchToDailyRead() {
 function renderDailyRead() {
   document.getElementById('cardsGrid').style.display = 'none';
   document.getElementById('supplementView').style.display = 'none';
+  document.getElementById('weeklyView').style.display = 'none';
   var view = document.getElementById('dailyReadView');
   view.style.display = 'block';
   $dayNum.textContent = '📖';
@@ -2025,7 +2026,9 @@ function collectAllData() {
     supplements: { customs: localStorage.getItem(suppMetaKey()) || null },
     suppContents: {},
     currentDay: localStorage.getItem(STORAGE_PREFIX + 'currentDay') || '1',
-    focusMode: localStorage.getItem(STORAGE_PREFIX + 'focusMode') || '0'
+    focusMode: localStorage.getItem(STORAGE_PREFIX + 'focusMode') || '0',
+    dailyread: localStorage.getItem(STORAGE_PREFIX + 'dailyread') || '',
+    weekly: localStorage.getItem(STORAGE_PREFIX + 'weekly') || ''
   };
   for (var i = 0; i < DAYS.length; i++) {
     var d = DAYS[i];
@@ -2055,6 +2058,8 @@ function restoreAllData(payload) {
   if (!payload) return;
   if (payload.currentDay) localStorage.setItem(STORAGE_PREFIX + 'currentDay', payload.currentDay);
   if (payload.focusMode) localStorage.setItem(STORAGE_PREFIX + 'focusMode', payload.focusMode);
+  if (payload.dailyread) localStorage.setItem(STORAGE_PREFIX + 'dailyread', payload.dailyread);
+  if (payload.weekly) localStorage.setItem(STORAGE_PREFIX + 'weekly', payload.weekly);
   if (payload.supplements && payload.supplements.customs) localStorage.setItem(suppMetaKey(), payload.supplements.customs);
   if (payload.suppContents) {
     Object.keys(payload.suppContents).forEach(function(k){
