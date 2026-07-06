@@ -1657,11 +1657,18 @@ function saveAnnotation() {
   span.className = 'vocab';
   span.setAttribute('data-tr', tr);
   if (ph) span.setAttribute('data-ph', ph);
-  span.textContent = annotateRange.toString();
+  var word = annotateRange.toString();
+  var tr = document.getElementById('annotateTr').value.trim();
+  var ph = document.getElementById('annotatePh').value.trim();
+  span.textContent = word;
+  span.setAttribute('data-tr', tr);
+  if (ph) span.setAttribute('data-ph', ph);
   annotateRange.deleteContents();
   annotateRange.insertNode(span);
   var editor = annotateEditor;
   cancelAnnotate();
+  // Save vocab as separate sync entry
+  saveVocabEntry(word, tr, ph);
   // Force immediate save - save the editor's content directly
   var editorId = editor.id;
   if (textareaIds.indexOf(editorId) >= 0) {
@@ -1714,6 +1721,7 @@ saveAnnotation = function(){
     window._editVocabEl.setAttribute('data-tr', tr);
     if (ph) window._editVocabEl.setAttribute('data-ph', ph);
     else window._editVocabEl.removeAttribute('data-ph');
+    saveVocabEntry(window._editVocabEl.textContent.trim(), tr, ph);
     window._editVocabEl = null;
     document.getElementById('annotatePopup').querySelector('div:first-child').textContent = '标注词汇';
     var ed = window._editVocabOrigEditor;
@@ -1746,6 +1754,19 @@ function cancelAnnotate() {
   document.getElementById('annotatePopup').querySelector('div:first-child').textContent = '标注词汇';
 }
 
+/* ===== Vocab storage as explicit JSON ===== */
+function getVocabData() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'vocab') || '[]'); } catch(e) { return []; }
+}
+function saveVocabEntry(word, tr, ph) {
+  var list = getVocabData();
+  // Remove existing entry for same word+tr
+  list = list.filter(function(v){ return !(v.word === word && v.tr === tr); });
+  list.push({ word: word, tr: tr, ph: ph, time: new Date().toISOString() });
+  localStorage.setItem(STORAGE_PREFIX + 'vocab', JSON.stringify(list));
+  uploadToCloud();
+}
+
 // ======= VOCABULARY LIST PAGE =======
 function switchToVocab() {
   currentView = 'vocab';
@@ -1766,42 +1787,10 @@ function renderVocabList() {
   document.title = '词汇表 — Transurfing 78';
   $prevBtn.disabled = true; $nextBtn.disabled = true;
 
-  // Scan all content for vocab spans
-  var vocabList = [];
-  for (var i = 0; i < DAYS.length; i++) {
-    textareaIds.forEach(function(field){
-      var html = localStorage.getItem(storageKey(i, field));
-      if (!html) return;
-      var div = document.createElement('div'); div.innerHTML = html;
-      var spans = div.querySelectorAll('.vocab');
-      spans.forEach(function(sp){
-        var word = sp.textContent.trim();
-        var tr = sp.getAttribute('data-tr') || '';
-        var ph = sp.getAttribute('data-ph') || '';
-        if (word && tr) {
-          vocabList.push({word:word, tr:tr, ph:ph, day:DAYS[i].day, field:field});
-        }
-      });
-    });
-  }
-  // Also scan daily read
-  var drHtml = localStorage.getItem(STORAGE_PREFIX + 'dailyread') || '';
-  if (drHtml) {
-    var ddiv = document.createElement('div'); ddiv.innerHTML = drHtml;
-    ddiv.querySelectorAll('.vocab').forEach(function(sp){
-      var word = sp.textContent.trim(), tr = sp.getAttribute('data-tr')||'', ph = sp.getAttribute('data-ph')||'';
-      if (word && tr) vocabList.push({word:word, tr:tr, ph:ph, day:'每日一读', field:''});
-    });
-  }
-
-  // Dedupe by word+tr
-  var seen = {};
-  vocabList = vocabList.filter(function(v){
-    var k = v.word + '|' + v.tr;
-    if (seen[k]) return false; seen[k] = true; return true;
-  });
-  // Sort by day
-  vocabList.sort(function(a,b){ return a.day - b.day; });
+  // Read vocab from explicit JSON storage
+  var vocabList = getVocabData();
+  // Sort by time (newest first)
+  vocabList.sort(function(a,b){ return (b.time||'').localeCompare(a.time||''); });
 
   var html = '<div class="supp-card"><h2 class="supp-title">📝 词汇表</h2>';
   if (vocabList.length === 0) {
@@ -2294,7 +2283,8 @@ function collectAllData() {
     currentDay: localStorage.getItem(STORAGE_PREFIX + 'currentDay') || '1',
     focusMode: localStorage.getItem(STORAGE_PREFIX + 'focusMode') || '0',
     dailyread: localStorage.getItem(STORAGE_PREFIX + 'dailyread') || '',
-    weekly: localStorage.getItem(STORAGE_PREFIX + 'weekly') || ''
+    weekly: localStorage.getItem(STORAGE_PREFIX + 'weekly') || '',
+    vocab: localStorage.getItem(STORAGE_PREFIX + 'vocab') || '[]'
   };
   for (var i = 0; i < DAYS.length; i++) {
     var d = DAYS[i];
@@ -2326,6 +2316,7 @@ function restoreAllData(payload) {
   if (payload.focusMode) localStorage.setItem(STORAGE_PREFIX + 'focusMode', payload.focusMode);
   if (payload.dailyread) localStorage.setItem(STORAGE_PREFIX + 'dailyread', payload.dailyread);
   if (payload.weekly) localStorage.setItem(STORAGE_PREFIX + 'weekly', payload.weekly);
+  if (payload.vocab) localStorage.setItem(STORAGE_PREFIX + 'vocab', payload.vocab);
   if (payload.supplements && payload.supplements.customs) localStorage.setItem(suppMetaKey(), payload.supplements.customs);
   if (payload.suppContents) {
     Object.keys(payload.suppContents).forEach(function(k){
