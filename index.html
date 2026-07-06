@@ -1105,25 +1105,6 @@ function renderSidebar() {
   wrGroup.appendChild(wrList);
   $dayNav.appendChild(wrGroup);
 
-  // Vocabulary section
-  var vGroup = document.createElement('div');
-  vGroup.className = 'part-group';
-  if (currentView !== 'vocab') vGroup.classList.add('collapsed');
-  var vToggle = document.createElement('button');
-  vToggle.className = 'part-toggle';
-  vToggle.innerHTML = '<span class="arrow">▼</span> 📝 词汇表';
-  vToggle.onclick = function(){ vGroup.classList.toggle('collapsed'); };
-  vGroup.appendChild(vToggle);
-  var vList = document.createElement('ul'); vList.className = 'day-list';
-  var vLi = document.createElement('li'); vLi.className = 'day-item';
-  var vLink = document.createElement('button');
-  vLink.className = 'day-link' + (currentView==='vocab' ? ' active' : '');
-  vLink.innerHTML = '<span class="dot filled"></span><span class="day-title">查看全部词汇</span>';
-  vLink.onclick = function(){ switchToVocab(); };
-  vLi.appendChild(vLink); vList.appendChild(vLi);
-  vGroup.appendChild(vList);
-  $dayNav.appendChild(vGroup);
-
   parts.forEach(partNum => {
     const group = document.createElement('div');
     group.className = 'part-group';
@@ -1200,6 +1181,25 @@ function renderSidebar() {
   addLi.appendChild(addBtn); suppList.appendChild(addLi);
   suppGroup.appendChild(suppList);
   $dayNav.appendChild(suppGroup);
+
+  // Vocabulary section (at the very bottom)
+  var vGroup = document.createElement('div');
+  vGroup.className = 'part-group';
+  if (currentView !== 'vocab') vGroup.classList.add('collapsed');
+  var vToggle = document.createElement('button');
+  vToggle.className = 'part-toggle';
+  vToggle.innerHTML = '<span class="arrow">▼</span> 📝 词汇表';
+  vToggle.onclick = function(){ vGroup.classList.toggle('collapsed'); };
+  vGroup.appendChild(vToggle);
+  var vList = document.createElement('ul'); vList.className = 'day-list';
+  var vLi = document.createElement('li'); vLi.className = 'day-item';
+  var vLink = document.createElement('button');
+  vLink.className = 'day-link' + (currentView==='vocab' ? ' active' : '');
+  vLink.innerHTML = '<span class="dot filled"></span><span class="day-title">查看全部词汇</span>';
+  vLink.onclick = function(){ switchToVocab(); };
+  vLi.appendChild(vLink); vList.appendChild(vLi);
+  vGroup.appendChild(vList);
+  $dayNav.appendChild(vGroup);
 }
 
 var currentView = 'day'; // 'day' or 'supplement'
