@@ -1181,11 +1181,15 @@ function renderSidebar() {
   addLi.appendChild(addBtn); suppList.appendChild(addLi);
   suppGroup.appendChild(suppList);
   $dayNav.appendChild(suppGroup);
+}
 
-  // Vocabulary section (at the very bottom)
+// Stick vocab right above the footer buttons (outside day-nav, always visible)
+(function(){
+  var sidebar = document.getElementById('sidebar');
+  var footer = document.querySelector('.sidebar-footer');
   var vGroup = document.createElement('div');
   vGroup.className = 'part-group';
-  if (currentView !== 'vocab') vGroup.classList.add('collapsed');
+  vGroup.style.cssText = 'padding:0;flex-shrink:0;';
   var vToggle = document.createElement('button');
   vToggle.className = 'part-toggle';
   vToggle.innerHTML = '<span class="arrow">▼</span> 📝 词汇表';
@@ -1199,8 +1203,8 @@ function renderSidebar() {
   vLink.onclick = function(){ switchToVocab(); };
   vLi.appendChild(vLink); vList.appendChild(vLi);
   vGroup.appendChild(vList);
-  $dayNav.appendChild(vGroup);
-}
+  if (footer) sidebar.insertBefore(vGroup, footer);
+})();
 
 var currentView = 'day'; // 'day' or 'supplement'
 var currentSuppIndex = 0;
