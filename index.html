@@ -361,6 +361,28 @@ body {
 .editable i, .editable em { font-style: italic; }
 .editable u { text-decoration: underline; }
 .editable .hl { background: #fef3a0; padding: 0 2px; border-radius: 2px; }
+.editable .vocab {
+  background: #e8f4e8; border-bottom: 2px dashed #5a9a5a;
+  padding: 0 1px; cursor: pointer; position: relative;
+  border-radius: 2px; transition: background 0.15s;
+}
+.editable .vocab:hover { background: #c8e8c8; }
+.editable .vocab::after {
+  content: attr(data-tr);
+  display: none; position: absolute;
+  bottom: 120%; left: 0;
+  background: #3a3224; color: #fff;
+  padding: 4px 10px; border-radius: 6px;
+  font-size: 0.75rem; white-space: nowrap;
+  z-index: 60; pointer-events: none;
+}
+.editable .vocab:hover::after { display: block; }
+.annotate-popup {
+  display: none; position: fixed; z-index: 300;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; width: 280px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
 .editable ul, .editable ol { padding-left: 24px; margin: 8px 0; }
 .editable li { margin-bottom: 4px; }
 .editable p { margin: 0 0 0.7em 0; line-height: inherit; }
@@ -751,6 +773,8 @@ body.focus-mode .main-header { padding-left: 28px; }
     <div id="dailyReadView" style="display:none; max-width:1100px;"></div>
     <!-- Weekly Review view (hidden by default) -->
     <div id="weeklyView" style="display:none; max-width:1100px;"></div>
+    <!-- Vocabulary view (hidden by default) -->
+    <div id="vocabView" style="display:none; max-width:1100px;"></div>
 
   </div>
 </main>
@@ -772,6 +796,19 @@ body.focus-mode .main-header { padding-left: 28px; }
   <button onclick="fmt('lineHeight','1.4')" title="紧凑行距">≡</button>
   <button onclick="fmt('lineHeight','1.8')" title="正常行距">☰</button>
   <button onclick="fmt('lineHeight','2.4')" title="宽松行距">≣</button>
+  <span class="fmt-sep"></span>
+  <button onclick="annotateVocab()" title="标注词汇（选中英文后点此添加翻译）">📝</button>
+</div>
+<!-- Annotation popup -->
+<div class="annotate-popup" id="annotatePopup">
+  <div style="margin-bottom:6px;font-weight:700;font-size:0.82rem;">标注词汇</div>
+  <div id="annotateWord" style="margin-bottom:8px;font-size:0.9rem;color:var(--gold);font-weight:600;"></div>
+  <input type="text" id="annotateTr" placeholder="翻译 / 释义" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:0.78rem;margin-bottom:6px;font-family:inherit;box-sizing:border-box;">
+  <input type="text" id="annotatePh" placeholder="音标（可选）" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:0.78rem;margin-bottom:10px;font-family:inherit;box-sizing:border-box;">
+  <div style="display:flex;gap:6px;justify-content:flex-end;">
+    <button onclick="cancelAnnotate()" style="padding:5px 12px;border:1px solid var(--border);border-radius:4px;background:var(--bg);cursor:pointer;font-size:0.75rem;font-family:inherit;">取消</button>
+    <button onclick="saveAnnotation()" style="padding:5px 12px;border:none;border-radius:4px;background:var(--gold);color:#fff;cursor:pointer;font-size:0.75rem;font-family:inherit;">保存</button>
+  </div>
 </div>
 
 <!-- AI Chat Launcher -->
@@ -1068,6 +1105,25 @@ function renderSidebar() {
   wrGroup.appendChild(wrList);
   $dayNav.appendChild(wrGroup);
 
+  // Vocabulary section
+  var vGroup = document.createElement('div');
+  vGroup.className = 'part-group';
+  if (currentView !== 'vocab') vGroup.classList.add('collapsed');
+  var vToggle = document.createElement('button');
+  vToggle.className = 'part-toggle';
+  vToggle.innerHTML = '<span class="arrow">▼</span> 📝 词汇表';
+  vToggle.onclick = function(){ vGroup.classList.toggle('collapsed'); };
+  vGroup.appendChild(vToggle);
+  var vList = document.createElement('ul'); vList.className = 'day-list';
+  var vLi = document.createElement('li'); vLi.className = 'day-item';
+  var vLink = document.createElement('button');
+  vLink.className = 'day-link' + (currentView==='vocab' ? ' active' : '');
+  vLink.innerHTML = '<span class="dot filled"></span><span class="day-title">查看全部词汇</span>';
+  vLink.onclick = function(){ switchToVocab(); };
+  vLi.appendChild(vLink); vList.appendChild(vLi);
+  vGroup.appendChild(vList);
+  $dayNav.appendChild(vGroup);
+
   parts.forEach(partNum => {
     const group = document.createElement('div');
     group.className = 'part-group';
@@ -1159,6 +1215,7 @@ function renderDailyRead() {
   document.getElementById('cardsGrid').style.display = 'none';
   document.getElementById('supplementView').style.display = 'none';
   document.getElementById('weeklyView').style.display = 'none';
+  document.getElementById('vocabView').style.display = 'none';
   var view = document.getElementById('dailyReadView');
   view.style.display = 'block';
   $dayNum.textContent = '📖';
@@ -1193,6 +1250,7 @@ function renderWeekly() {
   document.getElementById('supplementView').style.display = 'none';
   document.getElementById('dailyReadView').style.display = 'none';
   document.getElementById('weeklyView').style.display = 'none';
+  document.getElementById('vocabView').style.display = 'none';
   var view = document.getElementById('weeklyView');
   view.style.display = 'block';
   $dayNum.textContent = '📋';
@@ -1241,6 +1299,7 @@ function renderMain() {
   document.getElementById('supplementView').style.display = 'none';
   document.getElementById('dailyReadView').style.display = 'none';
   document.getElementById('weeklyView').style.display = 'none';
+  document.getElementById('vocabView').style.display = 'none';
   const d = DAYS[currentDay];
   $dayNum.textContent = d.day;
   var customTitle = localStorage.getItem(STORAGE_PREFIX + 'd' + d.day + '_title');
@@ -1346,6 +1405,7 @@ function renderSupplement() {
   document.getElementById('cardsGrid').style.display = 'none';
   document.getElementById('dailyReadView').style.display = 'none';
   document.getElementById('weeklyView').style.display = 'none';
+  document.getElementById('vocabView').style.display = 'none';
   var view = document.getElementById('supplementView');
   view.style.display = 'block';
 
@@ -1553,6 +1613,179 @@ if (toolbar) {
   toolbar.addEventListener('mouseenter', function(){ toolbar.classList.add('show'); });
   toolbar.addEventListener('mouseleave', function(){ hideToolbar(); });
 }
+/* ============================================
+   VOCAB ANNOTATION
+   ============================================ */
+var annotateRange = null;
+var annotateEditor = null;
+
+function annotateVocab() {
+  var sel = window.getSelection();
+  if (!sel || sel.isCollapsed || !sel.rangeCount) { alert('请先选中要标注的英文单词或句子'); return; }
+  var text = sel.toString().trim();
+  if (!text) return;
+  // Only allow annotation in English areas
+  var node = sel.anchorNode;
+  var editable = node.nodeType===3 ? node.parentElement.closest('[contenteditable]') : node.closest('[contenteditable]');
+  if (!editable || !(editable.classList.contains('text-en') || editable.id==='dailyReadEdit')) {
+    alert('请在英文内容区选中词汇（英文 Principle / Interpretation / 每日一读）');
+    return;
+  }
+  annotateRange = sel.getRangeAt(0).cloneRange();
+  annotateEditor = editable;
+  document.getElementById('annotateWord').textContent = text;
+  document.getElementById('annotateTr').value = '';
+  document.getElementById('annotatePh').value = '';
+  var popup = document.getElementById('annotatePopup');
+  var rect = sel.getRangeAt(0).getBoundingClientRect();
+  popup.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+  popup.style.left = (rect.left + window.scrollX) + 'px';
+  popup.style.display = 'block';
+  setTimeout(function(){ document.getElementById('annotateTr').focus(); }, 100);
+}
+
+function cancelAnnotate() {
+  document.getElementById('annotatePopup').style.display = 'none';
+  annotateRange = null; annotateEditor = null;
+}
+
+function saveAnnotation() {
+  var tr = document.getElementById('annotateTr').value.trim();
+  if (!tr) { alert('请输入翻译或释义'); return; }
+  var ph = document.getElementById('annotatePh').value.trim();
+  var span = document.createElement('span');
+  span.className = 'vocab';
+  span.setAttribute('data-tr', tr);
+  if (ph) span.setAttribute('data-ph', ph);
+  span.textContent = annotateRange.toString();
+  annotateRange.deleteContents();
+  annotateRange.insertNode(span);
+  cancelAnnotate();
+  // Trigger save
+  annotateEditor.dispatchEvent(new Event('input', {bubbles:true}));
+  autoResize(annotateEditor);
+}
+
+// Click on vocab to show detail
+document.addEventListener('click', function(e){
+  var vocab = e.target.closest('.vocab');
+  if (!vocab) return;
+  if (e.target.closest('.annotate-popup')) return;
+  var tr = vocab.getAttribute('data-tr') || '';
+  var ph = vocab.getAttribute('data-ph') || '';
+  var msg = (ph ? '[' + ph + '] ' : '') + tr;
+  // Show as small popup near the word
+  var rect = vocab.getBoundingClientRect();
+  var popup = document.getElementById('annotatePopup');
+  document.getElementById('annotateWord').textContent = vocab.textContent;
+  document.getElementById('annotateTr').value = tr;
+  document.getElementById('annotatePh').value = ph;
+  popup.querySelector('div:first-child').textContent = '词汇详情（可修改后保存）';
+  popup.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+  popup.style.left = (rect.left + window.scrollX) + 'px';
+  popup.style.display = 'block';
+  // Update on save
+  window._editVocabEl = vocab;
+  setTimeout(function(){ document.getElementById('annotateTr').focus(); }, 100);
+});
+
+// Override save for edit mode
+var _origSaveAnnotation = saveAnnotation;
+saveAnnotation = function(){
+  if (window._editVocabEl) {
+    var tr = document.getElementById('annotateTr').value.trim();
+    var ph = document.getElementById('annotatePh').value.trim();
+    if (!tr) { alert('请输入翻译'); return; }
+    window._editVocabEl.setAttribute('data-tr', tr);
+    if (ph) window._editVocabEl.setAttribute('data-ph', ph);
+    else window._editVocabEl.removeAttribute('data-ph');
+    window._editVocabEl = null;
+    document.getElementById('annotatePopup').querySelector('div:first-child').textContent = '标注词汇';
+    cancelAnnotate();
+    if (annotateEditor) annotateEditor.dispatchEvent(new Event('input', {bubbles:true}));
+    return;
+  }
+  _origSaveAnnotation();
+};
+
+function cancelAnnotate() {
+  document.getElementById('annotatePopup').style.display = 'none';
+  annotateRange = null; annotateEditor = null;
+  window._editVocabEl = null;
+  document.getElementById('annotatePopup').querySelector('div:first-child').textContent = '标注词汇';
+}
+
+// ======= VOCABULARY LIST PAGE =======
+function switchToVocab() {
+  currentView = 'vocab';
+  renderSidebar();
+  renderVocabList();
+  closeSidebar();
+}
+function renderVocabList() {
+  document.getElementById('cardsGrid').style.display = 'none';
+  document.getElementById('supplementView').style.display = 'none';
+  document.getElementById('dailyReadView').style.display = 'none';
+  document.getElementById('weeklyView').style.display = 'none';
+  document.getElementById('vocabView').style.display = 'none';
+  var view = document.getElementById('vocabView');
+  view.style.display = 'block';
+  $dayNum.textContent = '📝';
+  $dayTitleBoth.textContent = '词汇表';
+  document.title = '词汇表 — Transurfing 78';
+  $prevBtn.disabled = true; $nextBtn.disabled = true;
+
+  // Scan all content for vocab spans
+  var vocabList = [];
+  for (var i = 0; i < DAYS.length; i++) {
+    textareaIds.forEach(function(field){
+      var html = localStorage.getItem(storageKey(i, field));
+      if (!html) return;
+      var div = document.createElement('div'); div.innerHTML = html;
+      var spans = div.querySelectorAll('.vocab');
+      spans.forEach(function(sp){
+        var word = sp.textContent.trim();
+        var tr = sp.getAttribute('data-tr') || '';
+        var ph = sp.getAttribute('data-ph') || '';
+        if (word && tr) {
+          vocabList.push({word:word, tr:tr, ph:ph, day:DAYS[i].day, field:field});
+        }
+      });
+    });
+  }
+  // Also scan daily read
+  var drHtml = localStorage.getItem(STORAGE_PREFIX + 'dailyread') || '';
+  if (drHtml) {
+    var ddiv = document.createElement('div'); ddiv.innerHTML = drHtml;
+    ddiv.querySelectorAll('.vocab').forEach(function(sp){
+      var word = sp.textContent.trim(), tr = sp.getAttribute('data-tr')||'', ph = sp.getAttribute('data-ph')||'';
+      if (word && tr) vocabList.push({word:word, tr:tr, ph:ph, day:'每日一读', field:''});
+    });
+  }
+
+  // Dedupe by word+tr
+  var seen = {};
+  vocabList = vocabList.filter(function(v){
+    var k = v.word + '|' + v.tr;
+    if (seen[k]) return false; seen[k] = true; return true;
+  });
+  // Sort by day
+  vocabList.sort(function(a,b){ return a.day - b.day; });
+
+  var html = '<div class="supp-card"><h2 class="supp-title">📝 词汇表</h2>';
+  if (vocabList.length === 0) {
+    html += '<p style="color:var(--text-muted);padding:16px;">暂无标注词汇。在英文内容区选中单词，点 📝 按钮添加翻译后，词汇会自动出现在这里。</p>';
+  } else {
+    html += '<table class="supp-table"><tr><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">单词</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">音标</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">翻译</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">来源</th></tr>';
+    vocabList.forEach(function(v){
+      html += '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);font-weight:600;">' + v.word + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-muted);">' + v.ph + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);">' + v.tr + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-muted);font-size:0.8rem;">Day ' + v.day + '</td></tr>';
+    });
+    html += '</table>';
+  }
+  html += '</div>';
+  view.innerHTML = html;
+}
+
 // Show toolbar on text selection
 document.addEventListener('selectionchange', function(){
   var sel = window.getSelection();
