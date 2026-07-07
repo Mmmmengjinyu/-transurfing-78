@@ -668,6 +668,7 @@ body.focus-mode .main-header { padding-left: 28px; }
     <button onclick="document.getElementById('importFile').click()" title="导入">📤</button>
     <button id="cloudSetupBtn" onclick="setupCloud()" title="设置Token">⚙️</button>
     <button id="cloudBtn" onclick="downloadFromCloud()" title="下载">☁️</button>
+    <button onclick="switchToVocab()" title="词汇表">📝</button>
   </div>
   <div id="cloudInfo" style="padding:1px 10px 4px;font-size:0.58rem;color:var(--accent-cn);text-align:center;"></div>
   <input type="file" id="importFile" accept=".txt" style="display:none" onchange="importAll(this)">
@@ -1184,7 +1185,7 @@ function renderSidebar() {
   $dayNav.appendChild(suppGroup);
 }
 
-// Vocab inside day-nav (scrolls with everything else)
+// Vocab inside day-nav (scrolls with everything else, always expanded)
 var vGroup = document.createElement('div');
 vGroup.className = 'part-group';
 var vToggle = document.createElement('button');
@@ -1192,6 +1193,7 @@ vToggle.className = 'part-toggle';
 vToggle.innerHTML = '<span class="arrow">▼</span> 📝 词汇表';
 vToggle.onclick = function(){ vGroup.classList.toggle('collapsed'); };
 vGroup.appendChild(vToggle);
+var vList = document.createElement('ul'); vList.className = 'day-list';
 var vList = document.createElement('ul'); vList.className = 'day-list';
 var vLi = document.createElement('li'); vLi.className = 'day-item';
 var vLink = document.createElement('button');
