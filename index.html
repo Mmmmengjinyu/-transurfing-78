@@ -1184,28 +1184,23 @@ function renderSidebar() {
   $dayNav.appendChild(suppGroup);
 }
 
-// Stick vocab right above the footer buttons (outside day-nav, always visible)
-(function(){
-  var sidebar = document.getElementById('sidebar');
-  var footer = document.querySelector('.sidebar-footer');
-  var vGroup = document.createElement('div');
-  vGroup.className = 'part-group';
-  vGroup.style.cssText = 'padding:0;flex-shrink:0;';
-  var vToggle = document.createElement('button');
-  vToggle.className = 'part-toggle';
-  vToggle.innerHTML = '<span class="arrow">▼</span> 📝 词汇表';
-  vToggle.onclick = function(){ vGroup.classList.toggle('collapsed'); };
-  vGroup.appendChild(vToggle);
-  var vList = document.createElement('ul'); vList.className = 'day-list';
-  var vLi = document.createElement('li'); vLi.className = 'day-item';
-  var vLink = document.createElement('button');
-  vLink.className = 'day-link' + (currentView==='vocab' ? ' active' : '');
-  vLink.innerHTML = '<span class="dot filled"></span><span class="day-title">查看全部词汇</span>';
-  vLink.onclick = function(){ switchToVocab(); };
-  vLi.appendChild(vLink); vList.appendChild(vLi);
-  vGroup.appendChild(vList);
-  if (footer) sidebar.insertBefore(vGroup, footer);
-})();
+// Vocab inside day-nav (scrolls with everything else)
+var vGroup = document.createElement('div');
+vGroup.className = 'part-group';
+var vToggle = document.createElement('button');
+vToggle.className = 'part-toggle';
+vToggle.innerHTML = '<span class="arrow">▼</span> 📝 词汇表';
+vToggle.onclick = function(){ vGroup.classList.toggle('collapsed'); };
+vGroup.appendChild(vToggle);
+var vList = document.createElement('ul'); vList.className = 'day-list';
+var vLi = document.createElement('li'); vLi.className = 'day-item';
+var vLink = document.createElement('button');
+vLink.className = 'day-link' + (currentView==='vocab' ? ' active' : '');
+vLink.innerHTML = '<span class="dot filled"></span><span class="day-title">查看全部词汇</span>';
+vLink.onclick = function(){ switchToVocab(); };
+vLi.appendChild(vLink); vList.appendChild(vLi);
+vGroup.appendChild(vList);
+$dayNav.appendChild(vGroup);
 
 var currentView = 'day'; // 'day' or 'supplement'
 var currentSuppIndex = 0;
