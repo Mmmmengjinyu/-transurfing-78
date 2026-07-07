@@ -668,7 +668,6 @@ body.focus-mode .main-header { padding-left: 28px; }
     <button onclick="document.getElementById('importFile').click()" title="导入">📤</button>
     <button id="cloudSetupBtn" onclick="setupCloud()" title="设置Token">⚙️</button>
     <button id="cloudBtn" onclick="downloadFromCloud()" title="下载">☁️</button>
-    <button onclick="switchToVocab()" title="词汇表">📝</button>
   </div>
   <div id="cloudInfo" style="padding:1px 10px 4px;font-size:0.58rem;color:var(--accent-cn);text-align:center;"></div>
   <input type="file" id="importFile" accept=".txt" style="display:none" onchange="importAll(this)">
@@ -1183,26 +1182,25 @@ function renderSidebar() {
   addLi.appendChild(addBtn); suppList.appendChild(addLi);
   suppGroup.appendChild(suppList);
   $dayNav.appendChild(suppGroup);
-}
 
-// Vocab inside day-nav (scrolls with everything else, always expanded)
-var vGroup = document.createElement('div');
-vGroup.className = 'part-group';
-var vToggle = document.createElement('button');
-vToggle.className = 'part-toggle';
-vToggle.innerHTML = '<span class="arrow">▼</span> 📝 词汇表';
-vToggle.onclick = function(){ vGroup.classList.toggle('collapsed'); };
-vGroup.appendChild(vToggle);
-var vList = document.createElement('ul'); vList.className = 'day-list';
-var vList = document.createElement('ul'); vList.className = 'day-list';
-var vLi = document.createElement('li'); vLi.className = 'day-item';
-var vLink = document.createElement('button');
-vLink.className = 'day-link' + (currentView==='vocab' ? ' active' : '');
-vLink.innerHTML = '<span class="dot filled"></span><span class="day-title">查看全部词汇</span>';
-vLink.onclick = function(){ switchToVocab(); };
-vLi.appendChild(vLink); vList.appendChild(vLi);
-vGroup.appendChild(vList);
-$dayNav.appendChild(vGroup);
+  // Vocab section — inside day-nav, same pattern as supplements
+  var vGroup2 = document.createElement('div');
+  vGroup2.className = 'part-group';
+  var vToggle2 = document.createElement('button');
+  vToggle2.className = 'part-toggle';
+  vToggle2.innerHTML = '<span class="arrow">▼</span> 📝 词汇表';
+  vToggle2.onclick = function(){ vGroup2.classList.toggle('collapsed'); };
+  vGroup2.appendChild(vToggle2);
+  var vList2 = document.createElement('ul'); vList2.className = 'day-list';
+  var vLi2 = document.createElement('li'); vLi2.className = 'day-item';
+  var vLink2 = document.createElement('button');
+  vLink2.className = 'day-link' + (currentView==='vocab' ? ' active' : '');
+  vLink2.innerHTML = '<span class="dot filled"></span><span class="day-title">查看全部词汇</span>';
+  vLink2.onclick = function(){ switchToVocab(); };
+  vLi2.appendChild(vLink2); vList2.appendChild(vLi2);
+  vGroup2.appendChild(vList2);
+  $dayNav.appendChild(vGroup2);
+}
 
 var currentView = 'day'; // 'day' or 'supplement'
 var currentSuppIndex = 0;
