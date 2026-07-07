@@ -1668,12 +1668,14 @@ function saveAnnotation() {
   span.textContent = word;
   span.setAttribute('data-tr', tr);
   if (ph) span.setAttribute('data-ph', ph);
+  span.setAttribute('data-day', currentView === 'day' ? DAYS[currentDay].day : (currentView === 'dailyread' ? '每日一读' : ''));
   annotateRange.deleteContents();
   annotateRange.insertNode(span);
   var editor = annotateEditor;
   cancelAnnotate();
-  // Save vocab as separate sync entry
-  saveVocabEntry(word, tr, ph);
+  // Save vocab with source day
+  var srcDay = currentView === 'day' ? DAYS[currentDay].day : (currentView === 'dailyread' ? '每日一读' : '');
+  saveVocabEntry(word, tr, ph, srcDay);
   // Force immediate save - save the editor's content directly
   var editorId = editor.id;
   if (textareaIds.indexOf(editorId) >= 0) {
@@ -1726,7 +1728,8 @@ saveAnnotation = function(){
     window._editVocabEl.setAttribute('data-tr', tr);
     if (ph) window._editVocabEl.setAttribute('data-ph', ph);
     else window._editVocabEl.removeAttribute('data-ph');
-    saveVocabEntry(window._editVocabEl.textContent.trim(), tr, ph);
+    var oldDay = window._editVocabEl.getAttribute('data-day') || '';
+    saveVocabEntry(window._editVocabEl.textContent.trim(), tr, ph, oldDay);
     window._editVocabEl = null;
     document.getElementById('annotatePopup').querySelector('div:first-child').textContent = '标注词汇';
     var ed = window._editVocabOrigEditor;
@@ -1763,11 +1766,10 @@ function cancelAnnotate() {
 function getVocabData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'vocab') || '[]'); } catch(e) { return []; }
 }
-function saveVocabEntry(word, tr, ph) {
+function saveVocabEntry(word, tr, ph, srcDayOverride) {
   var list = getVocabData();
-  // Remove exact same word+tr entry (allow re-adding to update source)
   list = list.filter(function(v){ return !(v.word === word && v.tr === tr); });
-  var srcDay = currentView === 'day' ? DAYS[currentDay].day : (currentView === 'dailyread' ? '每日一读' : '');
+  var srcDay = srcDayOverride || (currentView === 'day' ? DAYS[currentDay].day : (currentView === 'dailyread' ? '每日一读' : ''));
   list.push({ word: word, tr: tr, ph: ph, time: new Date().toISOString(), day: srcDay });
   localStorage.setItem(STORAGE_PREFIX + 'vocab', JSON.stringify(list));
   uploadToCloud();
@@ -1798,10 +1800,16 @@ function deleteVocabEntry(index) {
 function migrateVocabFromContent() {
   var list = getVocabData();
   var changed = false;
-  function addIfNew(word, tr, ph) {
+  function addIfNew(word, tr, ph, day) {
     if (!word || !tr) return;
-    var exists = list.some(function(v){ return v.word === word && v.tr === tr; });
-    if (!exists) { list.push({ word: word, tr: tr, ph: ph, time: new Date().toISOString() }); changed = true; }
+    var found = false;
+    for (var j = 0; j < list.length; j++) {
+      if (list[j].word === word && list[j].tr === tr) {
+        if (!list[j].day && day) { list[j].day = day; changed = true; }
+        found = true; break;
+      }
+    }
+    if (!found) { list.push({ word: word, tr: tr, ph: ph, time: new Date().toISOString(), day: day || '' }); changed = true; }
   }
   for (var i = 0; i < DAYS.length; i++) {
     textareaIds.forEach(function(field){
@@ -1809,13 +1817,18 @@ function migrateVocabFromContent() {
       if (!html) return;
       var div = document.createElement('div'); div.innerHTML = html;
       div.querySelectorAll('.vocab').forEach(function(sp){
-        addIfNew(sp.textContent.trim(), sp.getAttribute('data-tr')||'', sp.getAttribute('data-ph')||'');
+        addIfNew(sp.textContent.trim(), sp.getAttribute('data-tr')||'', sp.getAttribute('data-ph')||'', sp.getAttribute('data-day')||DAYS[i].day);
       });
     });
   }
   var drHtml = localStorage.getItem(STORAGE_PREFIX + 'dailyread') || '';
-  if (drHtml) { var d = document.createElement('div'); d.innerHTML = drHtml; d.querySelectorAll('.vocab').forEach(function(sp){ addIfNew(sp.textContent.trim(), sp.getAttribute('data-tr')||'', sp.getAttribute('data-ph')||''); }); }
-  if (changed) localStorage.setItem(STORAGE_PREFIX + 'vocab', JSON.stringify(list));
+  if (drHtml) { var d = document.createElement('div'); d.innerHTML = drHtml; d.querySelectorAll('.vocab').forEach(function(sp){ addIfNew(sp.textContent.trim(), sp.getAttribute('data-tr')||'', sp.getAttribute('data-ph')||'', '每日一读'); }); }
+  // Fill in missing days from content scan
+  var needFix = false;
+  for (var k = 0; k < list.length; k++) {
+    if (!list[k].day) { list[k].day = ''; needFix = true; }
+  }
+  if (changed || needFix) localStorage.setItem(STORAGE_PREFIX + 'vocab', JSON.stringify(list));
 }
 
 // ======= VOCABULARY LIST PAGE =======
