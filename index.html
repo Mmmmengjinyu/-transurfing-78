@@ -385,8 +385,9 @@ body {
 }
 .editable ul, .editable ol { padding-left: 24px; margin: 8px 0; }
 .editable li { margin-bottom: 4px; }
-.editable p { margin: 0 0 0.7em 0; line-height: inherit; }
-.editable p:last-child { margin-bottom: 0; }
+.editable p, .editable div:not([class]) { margin: 0 0 0.7em 0; line-height: inherit; }
+.editable p:last-child, .editable div:last-child { margin-bottom: 0; }
+.editable br + br { display: none; }
 .card-body textarea:focus { outline: none; }
 .card-body textarea::placeholder { color: #c4b998; font-style: italic; }
 .card-body .saved-indicator {
@@ -1764,9 +1765,26 @@ function getVocabData() {
 }
 function saveVocabEntry(word, tr, ph) {
   var list = getVocabData();
+  // Remove exact same word+tr entry (allow re-adding to update source)
   list = list.filter(function(v){ return !(v.word === word && v.tr === tr); });
-  list.push({ word: word, tr: tr, ph: ph, time: new Date().toISOString() });
+  var srcDay = currentView === 'day' ? DAYS[currentDay].day : (currentView === 'dailyread' ? '每日一读' : '');
+  list.push({ word: word, tr: tr, ph: ph, time: new Date().toISOString(), day: srcDay });
   localStorage.setItem(STORAGE_PREFIX + 'vocab', JSON.stringify(list));
+  uploadToCloud();
+}
+function navigateToVocabSource(dayStr) {
+  if (!dayStr || dayStr === 'dailyread') { switchToDailyRead(); return; }
+  var dayNum = parseInt(dayStr);
+  if (isNaN(dayNum)) return;
+  var idx = DAYS.findIndex(function(d){ return d.day === dayNum; });
+  if (idx >= 0) switchToDay(idx);
+}
+
+function deleteVocabEntry(index) {
+  var list = getVocabData();
+  if (index >= 0 && index < list.length) { list.splice(index, 1); }
+  localStorage.setItem(STORAGE_PREFIX + 'vocab', JSON.stringify(list));
+  renderVocabList();
   uploadToCloud();
 }
 // Migrate: scan old content for vocab spans and add to JSON
@@ -1814,18 +1832,23 @@ function renderVocabList() {
   document.title = '词汇表 — Transurfing 78';
   $prevBtn.disabled = true; $nextBtn.disabled = true;
 
-  // Read vocab from explicit JSON storage
-  var vocabList = getVocabData();
-  // Sort by time (newest first)
+  // Read vocab from explicit JSON storage, dedup by word+tr
+  var rawList = getVocabData();
+  var seen = {}, vocabList = [];
+  rawList.forEach(function(v){
+    var k = v.word + '|' + v.tr;
+    if (!seen[k]) { seen[k] = true; vocabList.push(v); }
+  });
   vocabList.sort(function(a,b){ return (b.time||'').localeCompare(a.time||''); });
 
-  var html = '<div class="supp-card"><h2 class="supp-title">📝 词汇表</h2>';
+  var html = '<div class="supp-card"><h2 class="supp-title">📝 词汇表 (' + vocabList.length + ')</h2>';
   if (vocabList.length === 0) {
     html += '<p style="color:var(--text-muted);padding:16px;">暂无标注词汇。在英文内容区选中单词，点 📝 按钮添加翻译后，词汇会自动出现在这里。</p>';
   } else {
-    html += '<table class="supp-table"><tr><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">单词</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">音标</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">翻译</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">来源</th></tr>';
-    vocabList.forEach(function(v){
-      html += '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);font-weight:600;">' + v.word + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-muted);">' + v.ph + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);">' + v.tr + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-muted);font-size:0.8rem;">Day ' + v.day + '</td></tr>';
+    html += '<table class="supp-table"><tr><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">单词</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">音标</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">翻译</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">来源</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);width:30px;"></th></tr>';
+    vocabList.forEach(function(v, vi){
+      var srcLabel = v.day ? ('Day ' + v.day) : '—';
+      html += '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);font-weight:600;cursor:pointer;" ondblclick="navigateToVocabSource(\'' + v.day + '\')" title="双击跳转到来源">' + v.word + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-muted);">' + (v.ph||'') + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);">' + v.tr + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-muted);font-size:0.8rem;">' + srcLabel + '</td><td style="padding:6px 4px;border-bottom:1px solid var(--border);text-align:center;"><button onclick="deleteVocabEntry(' + vi + ')" style="border:none;background:none;color:#c44;cursor:pointer;font-size:0.8rem;padding:0;" title="删除">✕</button></td></tr>';
     });
     html += '</table>';
   }
