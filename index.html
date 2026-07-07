@@ -1673,9 +1673,8 @@ function saveAnnotation() {
   annotateRange.insertNode(span);
   var editor = annotateEditor;
   cancelAnnotate();
-  // Save vocab with source day
-  var srcDay = currentView === 'day' ? DAYS[currentDay].day : (currentView === 'dailyread' ? '每日一读' : '');
-  saveVocabEntry(word, tr, ph, srcDay);
+  // Save vocab with source day from the span itself
+  saveVocabEntry(word, tr, ph, span.getAttribute('data-day') || '');
   // Force immediate save - save the editor's content directly
   var editorId = editor.id;
   if (textareaIds.indexOf(editorId) >= 0) {
