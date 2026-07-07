@@ -1780,6 +1780,13 @@ function navigateToVocabSource(dayStr) {
   if (idx >= 0) switchToDay(idx);
 }
 
+function deleteVocabByKey(word, tr) {
+  var list = getVocabData();
+  list = list.filter(function(v){ return !(v.word === word && v.tr === tr); });
+  localStorage.setItem(STORAGE_PREFIX + 'vocab', JSON.stringify(list));
+  renderVocabList();
+  uploadToCloud();
+}
 function deleteVocabEntry(index) {
   var list = getVocabData();
   if (index >= 0 && index < list.length) { list.splice(index, 1); }
@@ -1848,7 +1855,8 @@ function renderVocabList() {
     html += '<table class="supp-table"><tr><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">单词</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">音标</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">翻译</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">来源</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);width:30px;"></th></tr>';
     vocabList.forEach(function(v, vi){
       var srcLabel = v.day ? ('Day ' + v.day) : '—';
-      html += '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);font-weight:600;cursor:pointer;" ondblclick="navigateToVocabSource(\'' + v.day + '\')" title="双击跳转到来源">' + v.word + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-muted);">' + (v.ph||'') + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);">' + v.tr + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-muted);font-size:0.8rem;">' + srcLabel + '</td><td style="padding:6px 4px;border-bottom:1px solid var(--border);text-align:center;"><button onclick="deleteVocabEntry(' + vi + ')" style="border:none;background:none;color:#c44;cursor:pointer;font-size:0.8rem;padding:0;" title="删除">✕</button></td></tr>';
+      var w = v.word.replace(/'/g,"\\'"), t = v.tr.replace(/'/g,"\\'");
+      html += '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);font-weight:600;cursor:pointer;" ondblclick="navigateToVocabSource(\'' + (v.day||'') + '\')" title="双击跳转到来源">' + v.word + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-muted);">' + (v.ph||'') + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);">' + v.tr + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-muted);font-size:0.8rem;">' + srcLabel + '</td><td style="padding:6px 4px;border-bottom:1px solid var(--border);text-align:center;"><button onclick="deleteVocabByKey(\'' + w + '\',\'' + t + '\')" style="border:none;background:none;color:#c44;cursor:pointer;font-size:0.8rem;padding:0;" title="删除">✕</button></td></tr>';
     });
     html += '</table>';
   }
