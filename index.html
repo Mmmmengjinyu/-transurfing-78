@@ -1786,6 +1786,22 @@ function deleteVocabByKey(word, tr) {
   var list = getVocabData();
   list = list.filter(function(v){ return !(v.word === word && v.tr === tr); });
   localStorage.setItem(STORAGE_PREFIX + 'vocab', JSON.stringify(list));
+  // Also remove the vocab span from all content
+  for (var i = 0; i < DAYS.length; i++) {
+    textareaIds.forEach(function(field){
+      var html = localStorage.getItem(storageKey(i, field));
+      if (!html) return;
+      var div = document.createElement('div'); div.innerHTML = html;
+      var changed = false;
+      div.querySelectorAll('.vocab').forEach(function(sp){
+        if (sp.textContent.trim() === word && (sp.getAttribute('data-tr')||'') === tr) {
+          sp.parentNode.replaceChild(document.createTextNode(sp.textContent), sp);
+          changed = true;
+        }
+      });
+      if (changed) localStorage.setItem(storageKey(i, field), div.innerHTML);
+    });
+  }
   renderVocabList();
   uploadToCloud();
 }
@@ -1838,8 +1854,9 @@ function switchToVocab() {
   renderVocabList();
   closeSidebar();
 }
+var _vocabMigrated = false;
 function renderVocabList() {
-  migrateVocabFromContent(); // always re-scan on open
+  if (!_vocabMigrated) { migrateVocabFromContent(); _vocabMigrated = true; }
   document.getElementById('cardsGrid').style.display = 'none';
   document.getElementById('supplementView').style.display = 'none';
   document.getElementById('dailyReadView').style.display = 'none';
