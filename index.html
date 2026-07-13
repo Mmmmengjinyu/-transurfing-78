@@ -1864,22 +1864,26 @@ function renderVocabList() {
   var html = '<div class="supp-card"><h2 class="supp-title">📝 词汇表 (' + vocabList.length + ')</h2>';
   if (vocabList.length === 0) {
     html += '<p style="color:var(--text-muted);padding:16px;">暂无标注词汇。在英文内容区选中单词，点 📝 按钮添加翻译后，词汇会自动出现在这里。</p>';
+    html += '</div>';
+    view.innerHTML = html;
   } else {
-    html += '<table class="supp-table"><tr><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">单词</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">音标</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">翻译</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">来源</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);width:30px;"></th></tr>';
-    vocabList.forEach(function(v, vi){
+    html += '<table class="supp-table"><thead><tr><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">单词</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">音标</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">翻译</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">来源</th><th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);width:30px;"></th></tr></thead><tbody></tbody></table></div>';
+    view.innerHTML = html;
+    var tbody = view.querySelector('tbody');
+    vocabList.forEach(function(v){
+      var tr = document.createElement('tr');
       var srcLabel = v.day ? ('Day ' + v.day) : '—';
-      html += '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);font-weight:600;cursor:pointer;" ondblclick="navigateToVocabSource(\'' + (v.day||'') + '\')" title="双击跳转到来源">' + v.word + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-muted);">' + (v.ph||'') + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);">' + v.tr + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-muted);font-size:0.8rem;">' + srcLabel + '</td><td style="padding:6px 4px;border-bottom:1px solid var(--border);text-align:center;"><button class="vocab-del-btn" data-word="' + v.word.replace(/"/g,'&quot;') + '" data-tr="' + v.tr.replace(/"/g,'&quot;') + '" style="border:none;background:none;color:#c44;cursor:pointer;font-size:1rem;padding:4px 8px;min-width:28px;" title="删除">✕</button></td></tr>';
+      tr.innerHTML = '<td style="padding:6px 8px;border-bottom:1px solid var(--border);font-weight:600;cursor:pointer;" ondblclick="navigateToVocabSource(\'' + (v.day||'') + '\')">' + v.word + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-muted);">' + (v.ph||'') + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);">' + v.tr + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-muted);font-size:0.8rem;">' + srcLabel + '</td>';
+      var td = document.createElement('td'); td.style.cssText = 'padding:6px 4px;border-bottom:1px solid var(--border);text-align:center;';
+      var btn = document.createElement('button');
+      btn.textContent = '✕';
+      btn.style.cssText = 'border:none;background:none;color:#c44;cursor:pointer;font-size:1rem;padding:4px 8px;min-width:28px;';
+      btn.title = '删除';
+      (function(w, t){ btn.onclick = function(){ deleteVocabByKey(w, t); }; })(v.word, v.tr);
+      td.appendChild(btn); tr.appendChild(td);
+      tbody.appendChild(tr);
     });
-    html += '</table>';
   }
-  html += '</div>';
-  view.innerHTML = html;
-  // Event delegation for delete buttons (avoids inline onclick escaping issues)
-  view.querySelectorAll('.vocab-del-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      deleteVocabByKey(this.getAttribute('data-word'), this.getAttribute('data-tr'));
-    });
-  });
 }
 
 // Show toolbar on text selection
