@@ -1782,6 +1782,27 @@ function navigateToVocabSource(dayStr) {
   if (idx >= 0) switchToDay(idx);
 }
 
+function exportVocabCSV() {
+  var list = getVocabData();
+  // Dedup
+  var seen = {}, deduped = [];
+  list.forEach(function(v){
+    var k = v.word + '|' + v.tr;
+    if (!seen[k]) { seen[k] = true; deduped.push(v); }
+  });
+  // CSV with BOM for Excel Chinese support
+  var csv = '﻿单词,音标,翻译,来源\n';
+  deduped.forEach(function(v){
+    var src = v.day ? ('Day ' + v.day) : '';
+    csv += '"' + v.word.replace(/"/g,'""') + '","' + (v.ph||'').replace(/"/g,'""') + '","' + v.tr.replace(/"/g,'""') + '","' + src + '"\n';
+  });
+  var blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = '词汇表_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+
 function deleteVocabByKey(word, tr) {
   var list = getVocabData();
   list = list.filter(function(v){ return !(v.word === word && v.tr === tr); });
@@ -1878,7 +1899,7 @@ function renderVocabList() {
   });
   vocabList.sort(function(a,b){ return (b.time||'').localeCompare(a.time||''); });
 
-  var html = '<div class="supp-card"><h2 class="supp-title">📝 词汇表 (' + vocabList.length + ')</h2>';
+  var html = '<div class="supp-card"><div style="display:flex;justify-content:space-between;align-items:center;"><h2 class="supp-title" style="margin:0;">📝 词汇表 (' + vocabList.length + ')</h2><button onclick="exportVocabCSV()" style="padding:6px 14px;border:1px solid var(--border);border-radius:6px;background:var(--bg);cursor:pointer;font-size:0.78rem;font-family:inherit;">📥 导出 Excel</button></div>';
   if (vocabList.length === 0) {
     html += '<p style="color:var(--text-muted);padding:16px;">暂无标注词汇。在英文内容区选中单词，点 📝 按钮添加翻译后，词汇会自动出现在这里。</p>';
     html += '</div>';
